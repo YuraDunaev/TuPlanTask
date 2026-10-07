@@ -1,0 +1,11 @@
+/CadBridge.AutoCAD/bin/**
+/CadBridge.AutoCAD/obj/**
+/CadBridge.Core.Tests/bin/**
+/CadBridge.Core.Tests/obj/**
+/CadBridge.Core/bin/**
+/CadBridge.Core/obj/**
+/CadBridge.Revit/bin/**
+/CadBridge.Revit/obj/**
+/.vs/**
+/TASK.ru.md
+/*.bat
