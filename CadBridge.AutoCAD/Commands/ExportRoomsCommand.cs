@@ -9,11 +9,22 @@ public class ExportRoomsCommand
     [CommandMethod("EXPORTROOMS")]
     public void Export()
     {
-        var editor = CadApplication.DocumentManager.MdiActiveDocument.Editor;
+        var document = CadApplication.DocumentManager.MdiActiveDocument;
+        if (document is null)
+            return;
+
+        var editor = document.Editor;
         try
         {
-            var command = new ExportRoomsUseCase().Execute();
-            editor.WriteMessage($"\n{command}");
+            var result = new ExportRoomsUseCase().Execute(document);
+
+            var tagged = result.Rooms.Count(room => room.Tag is not null);
+            editor.WriteMessage(
+                $"\n[CadBridge] Read {result.Rooms.Count} rooms ({tagged} tagged). " +
+                $"Warnings: {result.Warnings.Count}.");
+
+            foreach (var warning in result.Warnings)
+                editor.WriteMessage($"\n[CadBridge]   {warning}");
         }
         catch (System.Exception ex)
         {
@@ -21,3 +32,4 @@ public class ExportRoomsCommand
         }
     }
 }
+

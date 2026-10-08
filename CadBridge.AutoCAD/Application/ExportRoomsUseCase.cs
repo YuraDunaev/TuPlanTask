@@ -1,9 +1,14 @@
+using AcDocument = Autodesk.AutoCAD.ApplicationServices.Document;
+using CadBridge.AutoCAD.Reading;
+
 namespace CadBridge.AutoCAD.Application;
 
 public class ExportRoomsUseCase
 {
-    public string Execute()
+    public RoomReadResult Execute(AcDocument document)
     {
-        return "TODO: room reading is not implemented yet.";
+        ArgumentNullException.ThrowIfNull(document);
+        return new DwgRoomReader().Read(document);
     }
 }
+
