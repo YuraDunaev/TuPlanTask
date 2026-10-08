@@ -28,6 +28,8 @@ public readonly struct BoundaryVertex : IEquatable<BoundaryVertex>
     public static bool operator ==(BoundaryVertex left, BoundaryVertex right) => left.Equals(right);
     public static bool operator !=(BoundaryVertex left, BoundaryVertex right) => !left.Equals(right);
 
-    public override string ToString() => IsArc ? $"{Point} bulge={Bulge}" : Point.ToString();
+    public override string ToString() => IsArc
+        ? FormattableString.Invariant($"{Point} bulge={Bulge}")
+        : Point.ToString();
 }
 

@@ -21,6 +21,6 @@ public readonly struct Measure : IEquatable<Measure>
     public static bool operator ==(Measure left, Measure right) => left.Equals(right);
     public static bool operator !=(Measure left, Measure right) => !left.Equals(right);
 
-    public override string ToString() => $"{Value} {Unit.ToSymbol()}";
+    public override string ToString() => FormattableString.Invariant($"{Value} {Unit.ToSymbol()}");
 }
 

@@ -31,6 +31,6 @@ public readonly struct Point2D : IEquatable<Point2D>
     public static bool operator ==(Point2D left, Point2D right) => left.Equals(right);
     public static bool operator !=(Point2D left, Point2D right) => !left.Equals(right);
 
-    public override string ToString() => $"({X}, {Y})";
+    public override string ToString() => FormattableString.Invariant($"({X}, {Y})");
 }
 
