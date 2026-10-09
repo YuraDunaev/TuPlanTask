@@ -1,6 +1,7 @@
 using CadApplication = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using CadBridge.AutoCAD.Application;
 using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.EditorInput;
 
 namespace CadBridge.AutoCAD.Commands;
 
@@ -16,20 +17,26 @@ public class ExportRoomsCommand
         var editor = document.Editor;
         try
         {
-            var result = new ExportRoomsUseCase().Execute(document);
+            var useCase = new ExportRoomsUseCase();
+            var result = useCase.Export(document, out var jsonPath);
 
-            var tagged = result.Rooms.Count(room => room.Tag is not null);
+            editor.WriteMessage("\n[CadBridge] Всё готово. Диалог выбора файла: rooms.json.");
+
             editor.WriteMessage(
-                $"\n[CadBridge] Read {result.Rooms.Count} rooms ({tagged} tagged). " +
-                $"Warnings: {result.Warnings.Count}.");
+                string.Format(
+                    "\n[CadBridge] Exported {0} rooms. Warnings: {1}.",
+                    result.Document.Rooms.Count,
+                    result.ReadResult.Warnings.Count));
 
-            foreach (var warning in result.Warnings)
-                editor.WriteMessage($"\n[CadBridge]   {warning}");
+            foreach (var warning in result.ReadResult.Warnings)
+                editor.WriteMessage(string.Format("\n[CadBridge]   {0}", warning));
+
+            if (!string.IsNullOrEmpty(jsonPath))
+                editor.WriteMessage(string.Format("\n[CadBridge]   rooms.json written to: {0}", jsonPath));
         }
         catch (System.Exception ex)
         {
-            editor.WriteMessage($"\n[CadBridge] EXPORTROOMS failed: {ex.Message}");
+            editor.WriteMessage(string.Format("\n[CadBridge] EXPORTROOMS failed: {0}", ex.Message));
         }
     }
 }
-
