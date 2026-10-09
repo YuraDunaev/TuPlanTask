@@ -38,10 +38,7 @@ public class ExportRoomsUseCase
                     ? resolved
                     : new Point2D(0, 0);
 
-            var roomIdValue = string.IsNullOrWhiteSpace(draft.Tag?.Number)
-                ? draft.Boundary.Handle
-                : draft.Tag.Number;
-            var id = RoomId.TryParse(roomIdValue, out var parsedId) ? parsedId : default;
+            var id = RoomId.From(draft.Boundary.Handle);
             rooms.Add(new Room(id, draft.Tag?.Number, draft.Tag?.Name, area, perimeter, labelPoint, boundary));
         }
 

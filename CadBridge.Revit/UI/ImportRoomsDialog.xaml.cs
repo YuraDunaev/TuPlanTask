@@ -1,16 +1,20 @@
 using System.Windows;
+using Autodesk.Revit.DB;
 
 namespace CadBridge.Revit.UI;
 
 public partial class ImportRoomsDialog : Window
 {
-    public ImportRoomsDialog()
+    public ImportRoomsViewModel ViewModel { get; }
+
+    public ImportRoomsDialog(Document document)
     {
         InitializeComponent();
 
-        var viewModel = new ImportRoomsViewModel(PickFile);
-        viewModel.RequestClose += result => DialogResult = result;
-        DataContext = viewModel;
+        ViewModel = new ImportRoomsViewModel(PickFile);
+        ViewModel.RequestClose += result => DialogResult = result;
+        DataContext = ViewModel;
+        ViewModel.RefreshLevels(document);
     }
 
     private static string? PickFile()
@@ -22,5 +26,7 @@ public partial class ImportRoomsDialog : Window
 
         return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
+
+    private void OnCloseClick(object sender, RoutedEventArgs e) => DialogResult = false;
 }
 

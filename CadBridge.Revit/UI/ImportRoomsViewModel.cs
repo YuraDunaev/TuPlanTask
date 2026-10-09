@@ -1,12 +1,19 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using CadBridge.Core.Models;
+using CadBridge.Core.Serialization;
+using CadBridge.Revit.Adapters;
 
 namespace CadBridge.Revit.UI;
 
 public sealed class ImportRoomsViewModel : INotifyPropertyChanged
 {
     private readonly Func<string?> _pickFile;
+    private readonly List<Level> _levels = new();
+    private Document? _document;
     private string _filePath = string.Empty;
     private string? _selectedLevel;
     private int _totalCount;
@@ -33,7 +40,12 @@ public sealed class ImportRoomsViewModel : INotifyPropertyChanged
         set
         {
             if (Set(ref _filePath, value))
+            {
                 ImportCommand.NotifyCanExecuteChanged();
+
+                if (System.IO.File.Exists(value))
+                    LoadRoomsFile();
+            }
         }
     }
 
@@ -113,5 +125,76 @@ public sealed class ImportRoomsViewModel : INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-}
 
+    public void RefreshLevels(Document document)
+    {
+        _document = document;
+        Levels.Clear();
+        _levels.Clear();
+
+        var collector = new FilteredElementCollector(document)
+            .OfClass(typeof(Level))
+            .Cast<Level>()
+            .OrderBy(l => l.Name, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var level in collector)
+        {
+            _levels.Add(level);
+            Levels.Add(level.Name);
+        }
+
+        SelectedLevel = Levels.FirstOrDefault();
+
+        if (Levels.Count == 0)
+            TaskDialog.Show(
+                "CadBridge",
+                "В модели не найдено ни одного уровня (FilteredElementCollector → 0 элементов).");
+    }
+
+    public Level? GetSelectedLevel() =>
+        _levels.FirstOrDefault(l => l.Name == SelectedLevel);
+
+    private static string ResolveStatus(RevitRoomReader? reader, Room room)
+    {
+        if (room.Id.IsEmpty)
+            return "Error";
+
+        try
+        {
+            return reader is not null && reader.GetExisting(room.Id) is not null ? "Update" : "New";
+        }
+        catch
+        {
+            return "New";
+        }
+    }
+
+    public void LoadRoomsFile()
+    {
+        if (string.IsNullOrWhiteSpace(FilePath))
+            return;
+
+        var json = System.IO.File.ReadAllText(FilePath);
+        var document = RoomsJsonSerializer.Deserialize(json);
+        if (document is null)
+        {
+            Rooms.Clear();
+            return;
+        }
+
+        Rooms.Clear();
+        var reader = _document is null ? null : new RevitRoomReader(_document);
+        foreach (var room in document.Rooms)
+        {
+            Rooms.Add(new RoomPreviewRow(
+                room.Id.Value,
+                room.Number ?? string.Empty,
+                room.Name ?? string.Empty,
+                room.Area,
+                ResolveStatus(reader, room)));
+        }
+
+        TotalCount = Rooms.Count;
+        OnPropertyChanged(nameof(Summary));
+    }
+}
