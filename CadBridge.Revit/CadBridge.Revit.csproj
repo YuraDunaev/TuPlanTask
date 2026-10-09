@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- wpf нужен для диалога импорта (MVVM) -->
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,8 +11,18 @@
     <RootNamespace>CadBridge.Revit</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Ресурсы: png для иконок кнопок (svg — как исходники для перерисовки) -->
+    <EmbeddedResource Include="Assets\*.png" />
+    <EmbeddedResource Include="Assets\*.svg" />
+  </ItemGroup>
 
   <ItemGroup>
+    <!--
+      api ревит 2025.
+      ExcludeAssets="runtime" = Copy Local false: revitapi/revitapiui отдаёт
+      запущенный ревит, рядом с плагином их класть нельзя.
+    -->
     <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
