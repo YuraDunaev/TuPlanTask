@@ -76,4 +76,19 @@ public sealed class BoundaryTests
         Assert.Equal(new Point2D(1, 2), boundary[0].Point);
         Assert.Equal(new Point2D(5, 6), boundary[2].Point);
     }
+
+    [Fact]
+    public void Constructor_RejectsNonFiniteBulge()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new BoundaryVertex(0, 0, double.NaN));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new BoundaryVertex(0, 0, double.PositiveInfinity));
+    }
+
+    [Fact]
+    public void IsArc_TrueWhenBulgeNonZero()
+    {
+        Assert.True(new BoundaryVertex(0, 0, 0.1).IsArc);
+        Assert.True(new BoundaryVertex(0, 0, -0.1).IsArc);
+        Assert.False(new BoundaryVertex(0, 0, 0).IsArc);
+    }
 }

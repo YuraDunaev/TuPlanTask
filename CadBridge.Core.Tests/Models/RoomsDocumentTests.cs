@@ -65,6 +65,20 @@ public sealed class RoomsDocumentTests
     }
 
     [Fact]
+    public void ExplicitSchemaVersion_IsPreserved()
+    {
+        var document = new RoomsDocument(Source(), Array.Empty<Room>(), null, "2.1");
+
+        Assert.Equal("2.1", document.SchemaVersion);
+    }
+
+    [Fact]
+    public void CurrentSchemaVersion_ConstantIsOne()
+    {
+        Assert.Equal("1.0", RoomsDocument.CurrentSchemaVersion);
+    }
+
+    [Fact]
     public void Keeps_RoomsAndWarnings()
     {
         var room = MakeRoom("2A5", "105");
