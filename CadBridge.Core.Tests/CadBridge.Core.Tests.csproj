@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -24,6 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CadBridge.Core\CadBridge.Core.csproj" />
+    <ProjectReference Include="..\CadBridge.Revit\CadBridge.Revit.csproj" />
+    <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" />
   </ItemGroup>
 
 </Project>

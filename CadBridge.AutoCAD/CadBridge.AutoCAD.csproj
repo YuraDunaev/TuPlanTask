@@ -49,6 +49,18 @@
     <EmbeddedResource Include="Assets\clear-marks-32.png">
       <LogicalName>CadBridge.AutoCAD.Assets.clear-marks-32.png</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\issue-legend-16.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.issue-legend-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\issue-legend-32.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.issue-legend-32.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="..\CadBridge.Revit\UI\Themes\Palette.xaml" Link="UI\Themes\Palette.xaml" />
+    <Page Include="..\CadBridge.Revit\UI\Themes\Controls.xaml" Link="UI\Themes\Controls.xaml" />
+    <Page Include="..\CadBridge.Revit\UI\Themes\Controls.DataGrid.xaml" Link="UI\Themes\Controls.DataGrid.xaml" />
   </ItemGroup>
 
   <ItemGroup>

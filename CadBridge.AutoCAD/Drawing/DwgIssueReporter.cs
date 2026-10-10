@@ -13,7 +13,9 @@ public sealed class DwgIssueReporter
     private const double TextHeightCm = 20;
     private const double TextOffsetCm = 50;
     private const double CircleRadiusCm = 30;
+    private const double GlyphHeightCm = 21;
     private const string IssueKind = "issue";
+    private const string IssueGlyphKind = "issueglyph";
     private const string IssueLabelKind = "issuelabel";
 
     private readonly RoomMarkerStore _markers;
@@ -34,6 +36,7 @@ public sealed class DwgIssueReporter
         var positions = BuildPositionIndex(tr, space);
         var touched = new HashSet<string>(System.StringComparer.Ordinal);
 
+        var drawable = new List<(Warning Warning, string Key, Point2D At)>();
         foreach (var warning in warnings)
         {
             if (string.IsNullOrWhiteSpace(warning.EntityId))
@@ -41,10 +44,24 @@ public sealed class DwgIssueReporter
             if (!positions.TryGetValue(warning.EntityId, out var at))
                 continue;
 
-            var key = $"{warning.EntityId}:{warning.Code}";
+            drawable.Add((warning, $"{warning.EntityId}:{warning.Code}", at));
+        }
+
+        // Нумерация !1…!n: сверху вниз, слева направо; тай-брейк по ключу — детерминизм.
+        var ordered = drawable
+            .OrderByDescending(x => x.At.Y)
+            .ThenBy(x => x.At.X)
+            .ThenBy(x => x.Key, System.StringComparer.Ordinal)
+            .ToList();
+
+        var number = 0;
+        foreach (var (warning, key, at) in ordered)
+        {
+            number++;
             touched.Add($"{key}|{IssueKind}");
+            touched.Add($"{key}|{IssueGlyphKind}");
             touched.Add($"{key}|{IssueLabelKind}");
-            DrawIssue(tr, space, key, ShortLabel(warning.Code), at);
+            DrawIssue(tr, space, key, WarningCodeText.ShortLabel(warning.Code), at, number);
         }
 
         PruneIssues(tr, space, touched);
@@ -89,7 +106,7 @@ public sealed class DwgIssueReporter
         }
     }
 
-    private void DrawIssue(Transaction tr, BlockTableRecord space, string key, string label, Point2D at)
+    private void DrawIssue(Transaction tr, BlockTableRecord space, string key, string label, Point2D at, int number)
     {
         FindOwned(tr, space, key, IssueKind)?.Erase();
 
@@ -106,23 +123,51 @@ public sealed class DwgIssueReporter
         tr.AddNewlyCreatedDBObject(triangle, true);
         _markers.Mark(triangle, key, IssueKind);
 
+        var glyphPosition = new Point3d(at.X, at.Y, 0);
+        var glyphContent = $"!{number}";
+        if (FindOwned(tr, space, key, IssueGlyphKind) is DBText existingGlyph)
+        {
+            existingGlyph.Position = glyphPosition;
+            existingGlyph.AlignmentPoint = glyphPosition;
+            existingGlyph.TextString = glyphContent;
+        }
+        else
+        {
+            var glyph = new DBText
+            {
+                TextString = glyphContent,
+                Height = GlyphHeightCm,
+                Layer = LayerName,
+                ColorIndex = IssueColorIndex,
+                HorizontalMode = TextHorizontalMode.TextCenter,
+                VerticalMode = TextVerticalMode.TextVerticalMid,
+                Position = glyphPosition,
+                AlignmentPoint = glyphPosition,
+            };
+            space.AppendEntity(glyph);
+            tr.AddNewlyCreatedDBObject(glyph, true);
+            _markers.Mark(glyph, key, IssueGlyphKind);
+        }
+
         var labelPosition = new Point3d(at.X, at.Y + TextOffsetCm, 0);
         if (FindOwned(tr, space, key, IssueLabelKind) is DBText existingText)
         {
             existingText.Position = labelPosition;
+            existingText.AlignmentPoint = labelPosition;
             existingText.TextString = label;
         }
         else
         {
             var text = new DBText
             {
-                Position = labelPosition,
                 TextString = label,
                 Height = TextHeightCm,
                 Layer = LayerName,
                 ColorIndex = IssueColorIndex,
                 HorizontalMode = TextHorizontalMode.TextCenter,
                 VerticalMode = TextVerticalMode.TextVerticalMid,
+                Position = labelPosition,
+                AlignmentPoint = labelPosition,
             };
             space.AppendEntity(text);
             tr.AddNewlyCreatedDBObject(text, true);
@@ -168,7 +213,7 @@ public sealed class DwgIssueReporter
             var mark = _markers.Read(entity);
             if (mark is not { } m)
                 continue;
-            if (m.Kind != IssueKind && m.Kind != IssueLabelKind)
+            if (m.Kind != IssueKind && m.Kind != IssueGlyphKind && m.Kind != IssueLabelKind)
                 continue;
             if (touched.Contains($"{m.SourceId}|{m.Kind}"))
                 continue;
@@ -194,13 +239,42 @@ public sealed class DwgIssueReporter
         tr.AddNewlyCreatedDBObject(record, true);
     }
 
-    private static string ShortLabel(WarningCode code) => code switch
+    public IReadOnlyList<IssueLegendRow> ReadLegend(Transaction tr, BlockTableRecord space)
     {
-        WarningCode.OpenPolyline => "OPEN",
-        WarningCode.NoTag => "NO TAG",
-        WarningCode.MultipleTags => "TAGS x2",
-        WarningCode.OrphanTag => "ORPHAN",
-        WarningCode.CalculationFailed => "CALC",
-        _ => "ISSUE",
-    };
+        ArgumentNullException.ThrowIfNull(tr);
+        ArgumentNullException.ThrowIfNull(space);
+
+        var rows = new List<IssueLegendRow>();
+        foreach (ObjectId id in space)
+        {
+            if (id.IsErased)
+                continue;
+            if (tr.GetObject(id, OpenMode.ForRead) is not DBText glyph)
+                continue;
+            if (_markers.Read(glyph) is not { } mark || mark.Kind != IssueGlyphKind)
+                continue;
+
+            var code = ParseCode(mark.SourceId);
+            rows.Add(new IssueLegendRow(
+                glyph.TextString,
+                WarningCodeText.ShortLabel(code),
+                WarningCodeText.Description(code),
+                code));
+        }
+
+        return rows
+            .OrderBy(row => MarkerNumber(row.Marker))
+            .ThenBy(row => row.Marker, System.StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static WarningCode ParseCode(string sourceId)
+    {
+        var separator = sourceId.LastIndexOf(':');
+        var name = separator >= 0 ? sourceId[(separator + 1)..] : sourceId;
+        return System.Enum.TryParse(name, out WarningCode code) ? code : WarningCode.UnknownCode;
+    }
+
+    private static int MarkerNumber(string marker) =>
+        int.TryParse(marker.TrimStart('!'), out var number) ? number : int.MaxValue;
 }

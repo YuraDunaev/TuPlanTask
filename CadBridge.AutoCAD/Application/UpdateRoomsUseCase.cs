@@ -20,7 +20,8 @@ public sealed class UpdateRoomsUseCase
     private const short MarkerAlertColorIndex = 2;
     private static readonly LineWeight MarkerLineWeight = LineWeight.LineWeight200;
     private const double TextHeightCm = 25;
-    private const double TextOffsetCm = 45;
+    private const double TextOffsetCm = 70;
+    private const short TextColorIndex = 8;
     private const double CircleRadiusCm = 40;
 
     private readonly RoomMarkerStore _markers = new();
@@ -116,19 +117,22 @@ public sealed class UpdateRoomsUseCase
         if (existing is DBText text)
         {
             text.Position = center;
+            text.AlignmentPoint = center;
             text.TextString = content;
+            text.ColorIndex = TextColorIndex;
             return;
         }
-
+        
         var dbText = new DBText
         {
-            Position = center,
             TextString = content,
             Height = TextHeightCm,
             Layer = RoomMarkerStore.LayerName,
-            ColorIndex = MarkerColorIndex,
+            ColorIndex = TextColorIndex,
             HorizontalMode = TextHorizontalMode.TextCenter,
             VerticalMode = TextVerticalMode.TextVerticalMid,
+            Position = center,
+            AlignmentPoint = center,
         };
 
         space.AppendEntity(dbText);

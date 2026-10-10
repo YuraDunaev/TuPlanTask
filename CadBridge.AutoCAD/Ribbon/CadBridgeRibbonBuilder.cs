@@ -60,6 +60,16 @@ internal static class CadBridgeRibbonBuilder
                 "clear-marks-32.png",
                 "clear-marks-16.png"));
 
+            panelSource.Items.Add(new RibbonSeparator());
+
+            panelSource.Items.Add(CreateButton(
+                "issueLegend",
+                "Issue Legend",
+                "Таблица пояснений к маркерам !1…!n на чертеже",
+                "CADBRIDGELEGEND",
+                "issue-legend-32.png",
+                "issue-legend-16.png"));
+
             ribbon.Tabs.Add(tab);
             tab.IsActive = true;
             editor?.WriteMessage("\n[CadBridge] ribbon tab 'CAD Bridge' created.");
