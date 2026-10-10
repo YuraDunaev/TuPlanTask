@@ -18,7 +18,7 @@ public sealed class UpdateRoomsUseCase
     private const double ToleranceRatio = 0.01;
     private const short MarkerColorIndex = 1;
     private const short MarkerAlertColorIndex = 2;
-    private const LineWeight CircleLineWeight = LineWeight.LineWeight200;
+    private static readonly LineWeight MarkerLineWeight = LineWeight.LineWeight200;
     private const double TextHeightCm = 25;
     private const double TextOffsetCm = 45;
     private const double CircleRadiusCm = 40;
@@ -67,7 +67,7 @@ public sealed class UpdateRoomsUseCase
 
                 if (AreaDelta.Exceeds(room.RevitArea, room.CadArea, ToleranceRatio))
                 {
-                    DrawCircle(tr, space, room, label);
+                    DrawMarker(tr, space, room, label);
                     mismatched++;
                 }
 
@@ -136,29 +136,35 @@ public sealed class UpdateRoomsUseCase
         _markers.Mark(dbText, room.Id, RoomMarkerStore.KindText);
     }
 
-    private void DrawCircle(Transaction tr, BlockTableRecord space, RoomReport room, Point2D label)
+    private void DrawMarker(Transaction tr, BlockTableRecord space, RoomReport room, Point2D label)
     {
-        var center = new Point3d(label.X, label.Y, 0);
+        var cx = label.X;
+        var cy = label.Y;
+        var r = CircleRadiusCm;
 
-        var existing = FindOwned(tr, space, room.Id, RoomMarkerStore.KindMarker);
-        if (existing is Circle circle)
-        {
-            circle.Center = center;
-            circle.ColorIndex = MarkerAlertColorIndex;
-            circle.LineWeight = CircleLineWeight;
-            return;
-        }
+        FindOwned(tr, space, room.Id, RoomMarkerStore.KindMarker)?.Erase();
 
-        var newCircle = new Circle(center, Vector3d.ZAxis, CircleRadiusCm)
-        {
-            Layer = RoomMarkerStore.LayerName,
-            ColorIndex = MarkerAlertColorIndex,
-            LineWeight = CircleLineWeight,
-        };
+        var diamond = BuildClosedPolyline(
+            new Point2d(cx, cy + r),
+            new Point2d(cx + r, cy),
+            new Point2d(cx, cy - r),
+            new Point2d(cx - r, cy));
+        diamond.Layer = RoomMarkerStore.LayerName;
+        diamond.ColorIndex = MarkerAlertColorIndex;
+        diamond.LineWeight = MarkerLineWeight;
 
-        space.AppendEntity(newCircle);
-        tr.AddNewlyCreatedDBObject(newCircle, true);
-        _markers.Mark(newCircle, room.Id, RoomMarkerStore.KindMarker);
+        space.AppendEntity(diamond);
+        tr.AddNewlyCreatedDBObject(diamond, true);
+        _markers.Mark(diamond, room.Id, RoomMarkerStore.KindMarker);
+    }
+
+    private static Polyline BuildClosedPolyline(params Point2d[] points)
+    {
+        var poly = new Polyline(points.Length);
+        for (var i = 0; i < points.Length; i++)
+            poly.AddVertexAt(i, points[i], 0, 0, 0);
+        poly.Closed = true;
+        return poly;
     }
 
     private Entity? FindOwned(Transaction tr, BlockTableRecord space, string sourceId, string kind)

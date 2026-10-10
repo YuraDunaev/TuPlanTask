@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage
+    SchemaVersion="1.0"
+    AutodeskProduct="AutoCAD"
+    Name="CadBridge"
+    Description="AutoCAD &lt;-&gt; Revit room bridge"
+    AppVersion="1.0.0"
+    ProductType="Application">
+  <CompanyDetails Name="CadBridge" Url="" Email="" />
+  <RuntimeRequirements OS="Win64" Platform="AutoCAD*" SeriesMin="R25.0" />
+
+  <Components Description="AutoCAD x64">
+    <RuntimeRequirements OS="Win64" Platform="AutoCAD*" SeriesMin="R25.0" SeriesMax="R25.0" />
+    <ComponentEntry AppName="CadBridge" Version="1.0.0" ModuleName="./Contents/2025/CadBridge.AutoCAD.dll" LoadOnAutoCADStartup="True">
+      <Commands GroupName="CADBRIDGE">
+        <Command Global="EXPORTROOMS" />
+        <Command Global="UPDATEROOMS" />
+        <Command Global="CLEARMARKS" />
+      </Commands>
+    </ComponentEntry>
+  </Components>
+</ApplicationPackage>

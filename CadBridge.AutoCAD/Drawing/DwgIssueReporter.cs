@@ -9,7 +9,7 @@ namespace CadBridge.AutoCAD.Drawing;
 public sealed class DwgIssueReporter
 {
     public const string LayerName = "A-ROOM-ISSUE";
-    private const short IssueColorIndex = 30;
+    private const short IssueColorIndex = 6;
     private const double TextHeightCm = 20;
     private const double TextOffsetCm = 50;
     private const double CircleRadiusCm = 30;
@@ -91,24 +91,20 @@ public sealed class DwgIssueReporter
 
     private void DrawIssue(Transaction tr, BlockTableRecord space, string key, string label, Point2D at)
     {
-        var center = new Point3d(at.X, at.Y, 0);
+        FindOwned(tr, space, key, IssueKind)?.Erase();
 
-        if (FindOwned(tr, space, key, IssueKind) is Circle existingCircle)
-        {
-            existingCircle.Center = center;
-        }
-        else
-        {
-            var circle = new Circle(center, Vector3d.ZAxis, CircleRadiusCm)
-            {
-                Layer = LayerName,
-                ColorIndex = IssueColorIndex,
-                LineWeight = LineWeight.LineWeight100,
-            };
-            space.AppendEntity(circle);
-            tr.AddNewlyCreatedDBObject(circle, true);
-            _markers.Mark(circle, key, IssueKind);
-        }
+        var r = CircleRadiusCm;
+        var triangle = BuildClosedPolyline(
+            new Point2d(at.X, at.Y + r),
+            new Point2d(at.X - 0.8660254 * r, at.Y - 0.5 * r),
+            new Point2d(at.X + 0.8660254 * r, at.Y - 0.5 * r));
+        triangle.Layer = LayerName;
+        triangle.ColorIndex = IssueColorIndex;
+        triangle.LineWeight = LineWeight.LineWeight200;
+
+        space.AppendEntity(triangle);
+        tr.AddNewlyCreatedDBObject(triangle, true);
+        _markers.Mark(triangle, key, IssueKind);
 
         var labelPosition = new Point3d(at.X, at.Y + TextOffsetCm, 0);
         if (FindOwned(tr, space, key, IssueLabelKind) is DBText existingText)
@@ -132,6 +128,15 @@ public sealed class DwgIssueReporter
             tr.AddNewlyCreatedDBObject(text, true);
             _markers.Mark(text, key, IssueLabelKind);
         }
+    }
+
+    private static Polyline BuildClosedPolyline(params Point2d[] points)
+    {
+        var poly = new Polyline(points.Length);
+        for (var i = 0; i < points.Length; i++)
+            poly.AddVertexAt(i, points[i], 0, 0, 0);
+        poly.Closed = true;
+        return poly;
     }
 
     private Entity? FindOwned(Transaction tr, BlockTableRecord space, string sourceId, string kind)

@@ -10,6 +10,9 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>CadBridge.AutoCAD</AssemblyName>
     <RootNamespace>CadBridge.AutoCAD</RootNamespace>
+    <AcadInstallDir>C:\Program Files\Autodesk\AutoCAD 2025</AcadInstallDir>
+    <BundleName>CadBridge.bundle</BundleName>
+    <BundleDir>$(APPDATA)\Autodesk\ApplicationPlugins\$(BundleName)</BundleDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +20,55 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="AdWindows">
+      <HintPath>$(AcadInstallDir)\AdWindows.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CadBridge.Core\CadBridge.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\export-report-16.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.export-report-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\export-report-32.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.export-report-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\import-rooms-16.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.import-rooms-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\import-rooms-32.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.import-rooms-32.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\clear-marks-16.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.clear-marks-16.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\clear-marks-32.png">
+      <LogicalName>CadBridge.AutoCAD.Assets.clear-marks-32.png</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="PackageContents.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="CadBridge.AutoCAD.runtimeconfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>CadBridge.AutoCAD.runtimeconfig.json</Link>
+    </None>
+  </ItemGroup>
+
+  <Target Name="DeployBundle" AfterTargets="Build">
+    <ItemGroup>
+      <BundleFiles Include="$(TargetDir)**\*" />
+    </ItemGroup>
+    <MakeDir Directories="$(BundleDir)\Contents\2025" />
+    <Copy SourceFiles="@(BundleFiles)" DestinationFolder="$(BundleDir)\Contents\2025\%(RecursiveDir)" />
+    <Copy SourceFiles="PackageContents.xml" DestinationFolder="$(BundleDir)" />
+  </Target>
+
 </Project>
+
