@@ -8,7 +8,7 @@
     <sys:Double x:Key="Font.Size.Body">14</sys:Double>
     <sys:Double x:Key="Font.Size.Caption">12.5</sys:Double>
     <sys:Double x:Key="Font.Size.Header">16</sys:Double>
-    
+
     <sys:Double x:Key="Font.Size.Mono">12</sys:Double>
 
     <Color x:Key="Color.Window.Background">#1F1F1F</Color>
@@ -33,7 +33,7 @@
     <Color x:Key="Color.Grid.Header">#2D2D30</Color>
     <Color x:Key="Color.Grid.RowAlt">#242424</Color>
     <Color x:Key="Color.Grid.Line">#555555</Color>
-    
+
     <SolidColorBrush x:Key="Brush.Window.Background" Color="{StaticResource Color.Window.Background}" />
     <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" />
     <SolidColorBrush x:Key="Brush.Surface.Hover" Color="{StaticResource Color.Surface.Hover}" />
@@ -57,10 +57,11 @@
     <SolidColorBrush x:Key="Brush.Grid.RowAlt" Color="{StaticResource Color.Grid.RowAlt}" />
     <SolidColorBrush x:Key="Brush.Grid.Line" Color="{StaticResource Color.Grid.Line}" />
 
+
     <CornerRadius x:Key="Radius.Control">4</CornerRadius>
     <CornerRadius x:Key="Radius.Window">8</CornerRadius>
     <Thickness x:Key="Padding.Control">12,9</Thickness>
-    
+
     <Thickness x:Key="Padding.Field">10,2</Thickness>
     <sys:Double x:Key="Control.Height">44</sys:Double>
     <sys:Double x:Key="Grid.RowHeight">48</sys:Double>

@@ -1,6 +1,9 @@
+using System.IO;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CadBridge.Core.Serialization;
+using CadBridge.Revit.Application;
 
 namespace CadBridge.Revit.Commands;
 
@@ -9,7 +12,50 @@ public class ExportReportCommand : IExternalCommand
 {
     public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
-        message = "ExportReport not implemented yet";
-        return Result.Failed;
+        try
+        {
+            var document = commandData.Application.ActiveUIDocument.Document;
+
+            var useCase = new ExportReportUseCase(document);
+            var report = useCase.Execute();
+
+            if (report.Rooms.Count == 0)
+            {
+                TaskDialog.Show("CadBridge — Export Report", "Импортированные помещения не найдены. Сначала выполните Import Rooms.");
+                return Result.Cancelled;
+            }
+
+            var path = AskSavePath();
+            if (string.IsNullOrWhiteSpace(path))
+                return Result.Cancelled;
+
+            File.WriteAllText(path, RoomsReportJsonSerializer.Serialize(report));
+
+            TaskDialog.Show("CadBridge — Export Report",
+                $"Записан отчёт rooms_report.json ({report.Rooms.Count} пом.).\n{path}");
+            return Result.Succeeded;
+        }
+        catch (IOException ex)
+        {
+            message = $"Не удалось записать файл: {ex.Message}";
+            return Result.Failed;
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+            return Result.Failed;
+        }
+    }
+
+    private static string? AskSavePath()
+    {
+        using var dialog = new FileSaveDialog("rooms_report.json|*.json");
+        dialog.Title = "Сохранить rooms_report.json";
+        dialog.InitialFileName = "rooms_report.json";
+        if (dialog.Show() != ItemSelectionDialogResult.Confirmed)
+            return null;
+
+        var modelPath = dialog.GetSelectedModelPath();
+        return ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
     }
 }

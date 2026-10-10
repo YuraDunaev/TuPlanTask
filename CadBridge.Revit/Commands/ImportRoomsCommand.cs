@@ -79,6 +79,16 @@ public class ImportRoomsCommand : IExternalCommand
                 lines.Add($"  … и ещё {result.Errors.Count - 10}");
         }
 
+        if (result.Missing.Count > 0)
+        {
+            lines.Add(string.Empty);
+            lines.Add($"Отсутствуют в файле (не удалены): {result.Missing.Count}");
+            foreach (var missing in result.Missing.Take(10))
+                lines.Add($"  • {missing.Number} — {missing.Name}");
+            if (result.Missing.Count > 10)
+                lines.Add($"  … и ещё {result.Missing.Count - 10}");
+        }
+
         if (result.Warnings.Count > 0)
         {
             lines.Add(string.Empty);

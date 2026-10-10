@@ -54,6 +54,7 @@ public sealed class RevitRoomWriter
                 existing.Name = domainRoom.Name;
 
             _sourceIdStore.SetSourceId(existing, domainRoom.Id.Value);
+            _sourceIdStore.SetCadArea(existing, domainRoom.Area);
 
             transaction.Commit();
         }
@@ -81,6 +82,7 @@ public sealed class RevitRoomWriter
             room.Name = domainRoom.Name;
 
         _sourceIdStore.SetSourceId(room, domainRoom.Id.Value);
+        _sourceIdStore.SetCadArea(room, domainRoom.Area);
         return room;
     }
 
