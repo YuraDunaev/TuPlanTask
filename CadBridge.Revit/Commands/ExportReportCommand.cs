@@ -16,8 +16,10 @@ public class ExportReportCommand : IExternalCommand
         {
             var document = commandData.Application.ActiveUIDocument.Document;
 
+            var roomsJsonPath = AskRoomsJsonPath();
+
             var useCase = new ExportReportUseCase(document);
-            var report = useCase.Execute();
+            var report = useCase.Execute(roomsJsonPath);
 
             if (report.Rooms.Count == 0)
             {
@@ -45,6 +47,22 @@ public class ExportReportCommand : IExternalCommand
             message = ex.Message;
             return Result.Failed;
         }
+    }
+
+    private static string? AskRoomsJsonPath()
+    {
+        var answer = TaskDialog.Show("CadBridge — Export Report",
+            "Добавить в отчёт помещения с битым контуром из rooms.json?",
+            TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No);
+        if (answer != TaskDialogResult.Yes)
+            return null;
+
+        using var dialog = new FileOpenDialog("rooms.json|*.json");
+        dialog.Title = "Выберите rooms.json (можно отменить)";
+        if (dialog.Show() != ItemSelectionDialogResult.Confirmed)
+            return null;
+
+        return ModelPathUtils.ConvertModelPathToUserVisiblePath(dialog.GetSelectedModelPath());
     }
 
     private static string? AskSavePath()

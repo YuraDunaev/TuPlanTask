@@ -11,6 +11,8 @@ public sealed class RoomReport
     public double RevitArea { get; init; }
 
     public double? CadArea { get; init; }
+
+    public bool CadContourValid { get; init; } = true;
 }
 
 public sealed class RoomsReportDocument

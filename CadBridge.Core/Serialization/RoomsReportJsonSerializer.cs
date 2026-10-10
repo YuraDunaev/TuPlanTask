@@ -23,4 +23,10 @@ public static class RoomsReportJsonSerializer
         ArgumentNullException.ThrowIfNull(document);
         return JsonSerializer.Serialize(document, Options);
     }
+
+    public static RoomsReportDocument? Deserialize(string json)
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        return JsonSerializer.Deserialize<RoomsReportDocument>(json, Options);
+    }
 }
