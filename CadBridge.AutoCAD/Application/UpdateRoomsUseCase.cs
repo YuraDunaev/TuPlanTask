@@ -43,6 +43,7 @@ public sealed class UpdateRoomsUseCase
         var mismatched = 0;
         var missing = 0;
         var touchedIds = new HashSet<string>(System.StringComparer.Ordinal);
+        var discrepantIds = new HashSet<string>(System.StringComparer.Ordinal);
 
         var database = document.Database;
         using var tr = database.TransactionManager.StartTransaction();
@@ -69,13 +70,15 @@ public sealed class UpdateRoomsUseCase
                 if (AreaDelta.Exceeds(room.RevitArea, room.CadArea, ToleranceRatio))
                 {
                     DrawMarker(tr, space, room, label);
+                    discrepantIds.Add(room.Id);
                     mismatched++;
                 }
 
                 marked++;
             }
 
-            PruneMarkers(tr, space, touchedIds, RoomMarkerStore.KindText, RoomMarkerStore.KindMarker);
+            PruneMarkers(tr, space, touchedIds, RoomMarkerStore.KindText);
+            PruneMarkers(tr, space, discrepantIds, RoomMarkerStore.KindMarker);
 
             new DwgIssueReporter(_markers).Report(tr, space, readResult.Warnings);
 

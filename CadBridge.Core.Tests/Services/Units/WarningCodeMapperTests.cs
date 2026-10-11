@@ -11,6 +11,7 @@ public sealed class WarningCodeMapperTests
     [InlineData(WarningCode.MultipleTags, "MULTIPLE_TAGS")]
     [InlineData(WarningCode.OrphanTag, "ORPHAN_TAG")]
     [InlineData(WarningCode.CalculationFailed, "CALCULATION_FAILED")]
+    [InlineData(WarningCode.NoLabelPoint, "NO_LABEL_POINT")]
     public void ToWire_MapsEveryKnownCode(WarningCode code, string expected)
     {
         Assert.Equal(expected, WarningCodeMapper.ToWire(code));
@@ -28,6 +29,7 @@ public sealed class WarningCodeMapperTests
     [InlineData("MULTIPLE_TAGS", WarningCode.MultipleTags)]
     [InlineData("ORPHAN_TAG", WarningCode.OrphanTag)]
     [InlineData("CALCULATION_FAILED", WarningCode.CalculationFailed)]
+    [InlineData("NO_LABEL_POINT", WarningCode.NoLabelPoint)]
     public void FromWire_ParsesScreamingSnake(string wire, WarningCode expected)
     {
         Assert.Equal(expected, WarningCodeMapper.FromWire(wire));

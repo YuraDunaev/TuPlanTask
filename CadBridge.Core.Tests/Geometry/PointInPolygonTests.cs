@@ -181,7 +181,7 @@ public sealed class PointInPolygonTests
     public void IsInside_ThrowsForNullBoundary()
     {
         Assert.Throws<ArgumentNullException>(
-            () => PointInPolygon.IsInside(new Point2D(0, 0), null!));
+            () => PointInPolygon.IsInside(new Point2D(0, 0), (Boundary)null!));
     }
 
     [Fact]

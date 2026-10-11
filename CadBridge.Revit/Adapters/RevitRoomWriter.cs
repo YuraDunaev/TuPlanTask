@@ -9,6 +9,7 @@ public sealed class RevitRoomWriter
     private readonly Document _document;
     private readonly Level _level;
     private readonly SourceIdStore _sourceIdStore = new();
+    private readonly SeparationLineStore _separationLineStore = new();
 
     public RevitRoomWriter(Document document, Level level)
     {
@@ -25,12 +26,17 @@ public sealed class RevitRoomWriter
         try
         {
             var room = CreateCore(domainRoom);
-            transaction.Commit();
+            var status = transaction.Commit();
+            if (status != TransactionStatus.Committed)
+                throw new InvalidOperationException(
+                    $"Create transaction for room {domainRoom} was not committed (status: {status}).");
+
             return room;
         }
         catch (System.Exception ex)
         {
-            transaction.RollBack();
+            if (transaction.GetStatus() == TransactionStatus.Started)
+                transaction.RollBack();
             throw new InvalidOperationException($"Failed to create room {domainRoom}: {ex.Message}", ex);
         }
     }
@@ -44,9 +50,9 @@ public sealed class RevitRoomWriter
         transaction.Start();
         try
         {
-            DeleteSeparationLines(existing);
+            DeleteSeparationLines(existing, domainRoom.Id.Value);
 
-            CreateSeparationLines(domainRoom.Boundary);
+            CreateSeparationLines(domainRoom.Boundary, domainRoom.Id.Value);
 
             if (!string.IsNullOrWhiteSpace(domainRoom.Number))
                 existing.Number = domainRoom.Number;
@@ -56,18 +62,22 @@ public sealed class RevitRoomWriter
             _sourceIdStore.SetSourceId(existing, domainRoom.Id.Value);
             _sourceIdStore.SetCadArea(existing, domainRoom.Area);
 
-            transaction.Commit();
+            var status = transaction.Commit();
+            if (status != TransactionStatus.Committed)
+                throw new InvalidOperationException(
+                    $"Update transaction for room {domainRoom} was not committed (status: {status}).");
         }
         catch (System.Exception ex)
         {
-            transaction.RollBack();
+            if (transaction.GetStatus() == TransactionStatus.Started)
+                transaction.RollBack();
             throw new InvalidOperationException($"Failed to update room {domainRoom}: {ex.Message}", ex);
         }
     }
 
     private Autodesk.Revit.DB.Architecture.Room CreateCore(Room domainRoom)
     {
-        CreateSeparationLines(domainRoom.Boundary);
+        CreateSeparationLines(domainRoom.Boundary, domainRoom.Id.Value);
 
         var label = domainRoom.LabelPoint;
         var location = new UV(CmToFt(label.X), CmToFt(label.Y));
@@ -86,7 +96,7 @@ public sealed class RevitRoomWriter
         return room;
     }
 
-    private void CreateSeparationLines(Boundary boundary)
+    private void CreateSeparationLines(Boundary boundary, string ownerSourceId)
     {
         var view = FindPlanView();
         var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, new XYZ(0, 0, _level.Elevation));
@@ -101,7 +111,12 @@ public sealed class RevitRoomWriter
             curves.Append(BuildCurve(current, next));
         }
 
-        _document.Create.NewRoomBoundaryLines(sketchPlane, curves, view);
+        var created = _document.Create.NewRoomBoundaryLines(sketchPlane, curves, view);
+        if (created is null)
+            return;
+
+        foreach (ModelCurve curve in created)
+            _separationLineStore.Mark(curve, ownerSourceId);
     }
 
     private Curve BuildCurve(BoundaryVertex current, BoundaryVertex next)
@@ -122,7 +137,7 @@ public sealed class RevitRoomWriter
         return Arc.Create(from, to, ToXyz(mid, z));
     }
 
-    private void DeleteSeparationLines(Autodesk.Revit.DB.Architecture.Room room)
+    private void DeleteSeparationLines(Autodesk.Revit.DB.Architecture.Room room, string ownerSourceId)
     {
         var options = new SpatialElementBoundaryOptions
         {
@@ -139,7 +154,10 @@ public sealed class RevitRoomWriter
                     continue;
 
                 var element = _document.GetElement(id);
-                if (element?.Category?.Id.Value == (int)BuiltInCategory.OST_RoomSeparationLines)
+                if (element?.Category?.Id.Value != (int)BuiltInCategory.OST_RoomSeparationLines)
+                    continue;
+
+                if (_separationLineStore.GetOwner(element) == ownerSourceId)
                     ids.Add(id);
             }
         }

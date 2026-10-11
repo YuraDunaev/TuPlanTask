@@ -70,6 +70,10 @@ public sealed class ExportReportUseCase
         {
             return;
         }
+        catch (InvalidDataException)
+        {
+            return;
+        }
 
         if (source is null)
             return;

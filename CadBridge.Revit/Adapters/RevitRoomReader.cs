@@ -39,20 +39,9 @@ public sealed class RevitRoomReader
             })
             .ToList();
 
-        if (matching.Count > 0)
-            return new RevitRoomEntity { Element = matching[0], Level = matching[0].Level };
-
-        var byNumber = new FilteredElementCollector(_document)
-            .OfCategory(BuiltInCategory.OST_Rooms)
-            .WhereElementIsNotElementType()
-            .Cast<Autodesk.Revit.DB.Architecture.Room>()
-            .Where(r => r.Number == idString)
-            .ToList();
-
-        if (byNumber.Count > 0)
-            return new RevitRoomEntity { Element = byNumber[0], Level = byNumber[0].Level };
-
-        return null;
+        return matching.Count > 0
+            ? new RevitRoomEntity { Element = matching[0], Level = matching[0].Level }
+            : null;
     }
 
     public IReadOnlyList<RevitRoomEntity> GetAll()

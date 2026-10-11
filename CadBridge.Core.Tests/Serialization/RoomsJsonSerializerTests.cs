@@ -1,3 +1,4 @@
+using System.IO;
 using CadBridge.Core.Models;
 using CadBridge.Core.Serialization;
 
@@ -167,7 +168,7 @@ public sealed class RoomsJsonSerializerTests
     }
 
     [Fact]
-    public void Deserialize_RoomWithoutId_GeneratesNonEmptyHandle()
+    public void Deserialize_RoomWithoutId_ThrowsValidationError()
     {
         const string json = """
         {
@@ -178,13 +179,7 @@ public sealed class RoomsJsonSerializerTests
         }
         """;
 
-        var document = RoomsJsonSerializer.Deserialize(json);
-
-        Assert.NotNull(document);
-        Assert.Single(document!.Rooms);
-        Assert.False(string.IsNullOrWhiteSpace(document.Rooms[0].Id.Value));
-        Assert.NotEqual("00000000-0000-0000-0000-0000-0000-0000", document.Rooms[0].Id.Value);
-        Assert.Equal("7", document.Rooms[0].Number);
+        Assert.Throws<InvalidDataException>(() => RoomsJsonSerializer.Deserialize(json));
     }
 
     [Fact]

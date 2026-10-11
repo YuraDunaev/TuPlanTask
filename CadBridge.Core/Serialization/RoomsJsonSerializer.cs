@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CadBridge.Core.Models;
@@ -113,10 +114,15 @@ public static class RoomsJsonSerializer
 
     private static Room ToModel(RoomDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Id))
+            throw new InvalidDataException(
+                "Room record is missing a stable 'id'. A room must carry the source handle so that " +
+                "repeated imports update the same room instead of creating duplicates.");
+
         var vertices = dto.Boundary.Select(v => new BoundaryVertex(v.X, v.Y, v.Bulge));
         var boundary = new Boundary(vertices);
         var label = new Point2D(dto.LabelPoint?.X ?? 0, dto.LabelPoint?.Y ?? 0);
-        var id = RoomId.From(string.IsNullOrWhiteSpace(dto.Id) ? Guid.NewGuid().ToString("N") : dto.Id);
+        var id = RoomId.From(dto.Id);
 
         return new Room(id, dto.Number, dto.Name, dto.Area, dto.Perimeter, label, boundary);
     }

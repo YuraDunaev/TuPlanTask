@@ -19,7 +19,7 @@ public class UpdateRoomsCommand
         var editor = document.Editor;
         try
         {
-            var reportPath = ShowOpenDialog(document);
+            var reportPath = ShowOpenDialog();
             if (string.IsNullOrWhiteSpace(reportPath))
             {
                 editor.WriteMessage("\n[CadBridge] UPDATEROOMS cancelled: no file selected.");
@@ -38,10 +38,8 @@ public class UpdateRoomsCommand
         }
     }
 
-    private static string ShowOpenDialog(Document document)
+    private static string ShowOpenDialog()
     {
-        document.LockDocument();
-
         var dialog = new OpenFileDialog
         {
             Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",

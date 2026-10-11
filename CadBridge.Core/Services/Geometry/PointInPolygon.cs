@@ -7,11 +7,20 @@ public static class PointInPolygon
 {
     private const double OnEdgeTolerance = 1e-6;
 
+    private const double ChordToleranceCm = 0.05;
+
+    private const int MinArcSegments = 8;
+
+    private const int MaxArcSegments = 512;
+
     public static bool IsInside(Point2D point, Boundary boundary)
     {
         ArgumentNullException.ThrowIfNull(boundary);
+        return IsInside(point, Flatten(boundary));
+    }
 
-        var polygon = Flatten(boundary);
+    public static bool IsInside(Point2D point, List<Point2D> polygon)
+    {
         if (polygon.Count < 3)
             return false;
 
@@ -43,10 +52,30 @@ public static class PointInPolygon
             var next = boundary[(i + 1) % boundary.Count].Point;
             polygon.Add(vertex.Point);
             if (vertex.IsArc)
-                polygon.AddRange(BulgeArc.Create(vertex.Point, next, vertex.Bulge).Flatten());
+            {
+                var arc = BulgeArc.Create(vertex.Point, next, vertex.Bulge);
+                polygon.AddRange(arc.Flatten(SegmentCountFor(arc)));
+            }
         }
 
         return polygon;
+    }
+
+    private static int SegmentCountFor(BulgeArc arc)
+    {
+        if (!arc.IsArc || arc.Radius <= 0.0)
+            return 1;
+
+        var ratio = 1.0 - ChordToleranceCm / arc.Radius;
+        if (ratio <= -1.0)
+            return MaxArcSegments;
+
+        var maxStep = 2.0 * Math.Acos(Math.Clamp(ratio, -1.0, 1.0));
+        if (maxStep <= 0.0)
+            return MaxArcSegments;
+
+        var segments = (int)Math.Ceiling(Math.Abs(arc.Sweep) / maxStep);
+        return Math.Clamp(segments, MinArcSegments, MaxArcSegments);
     }
 
     private static bool IsOnBoundary(Point2D point, List<Point2D> polygon)

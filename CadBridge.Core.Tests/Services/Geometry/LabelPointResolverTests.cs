@@ -78,4 +78,36 @@ public sealed class LabelPointResolverTests
     {
         Assert.Throws<ArgumentNullException>(() => LabelPointResolver.TryResolve(null!, out _));
     }
+
+    [Fact]
+    public void UShapeWithStripsThinnerThanGrid_DoesNotResolveToBoundaryCorner()
+    {
+        var boundary = new Boundary(new[]
+        {
+            new BoundaryVertex(0, 0, 0),
+            new BoundaryVertex(4000, 0, 0),
+            new BoundaryVertex(4000, 4000, 0),
+            new BoundaryVertex(50, 4000, 0),
+            new BoundaryVertex(50, 50, 0),
+            new BoundaryVertex(3950, 50, 0),
+            new BoundaryVertex(3950, 4000, 0),
+            new BoundaryVertex(0, 4000, 0),
+        });
+
+        var resolved = LabelPointResolver.TryResolve(boundary, out var point);
+
+        Assert.False(resolved);
+        Assert.Equal(default(Point2D), point);
+    }
+
+    [Fact]
+    public void UShape_LabelIsStrictlyInsideWithPositiveOffset()
+    {
+        var boundary = UShape();
+        var resolved = LabelPointResolver.TryResolve(boundary, out var point);
+
+        Assert.True(resolved);
+        Assert.True(PointInPolygon.IsInside(point, boundary),
+            $"Label point {point} fell outside the room.");
+    }
 }

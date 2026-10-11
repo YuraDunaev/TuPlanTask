@@ -11,6 +11,7 @@ public static class WarningCodeMapper
         WarningCode.MultipleTags => "MULTIPLE_TAGS",
         WarningCode.OrphanTag => "ORPHAN_TAG",
         WarningCode.CalculationFailed => "CALCULATION_FAILED",
+        WarningCode.NoLabelPoint => "NO_LABEL_POINT",
         _ => "UNKNOWN",
     };
 
@@ -21,6 +22,7 @@ public static class WarningCodeMapper
         "MULTIPLE_TAGS" => WarningCode.MultipleTags,
         "ORPHAN_TAG" => WarningCode.OrphanTag,
         "CALCULATION_FAILED" => WarningCode.CalculationFailed,
+        "NO_LABEL_POINT" => WarningCode.NoLabelPoint,
         _ => WarningCode.UnknownCode,
     };
 }

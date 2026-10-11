@@ -12,6 +12,7 @@ public sealed class WarningCodeTextTests
         Assert.Equal("TAGS x2", WarningCodeText.ShortLabel(WarningCode.MultipleTags));
         Assert.Equal("ORPHAN", WarningCodeText.ShortLabel(WarningCode.OrphanTag));
         Assert.Equal("CALC", WarningCodeText.ShortLabel(WarningCode.CalculationFailed));
+        Assert.Equal("NO LABEL", WarningCodeText.ShortLabel(WarningCode.NoLabelPoint));
         Assert.Equal("ISSUE", WarningCodeText.ShortLabel(WarningCode.UnknownCode));
     }
 

@@ -7,6 +7,8 @@ public static class LabelPointResolver
 {
     private const int GridResolution = 64;
 
+    private const double MinLabelOffsetCm = 1e-6;
+
     public static bool TryResolve(Boundary boundary, out Point2D labelPoint)
     {
         ArgumentNullException.ThrowIfNull(boundary);
@@ -20,13 +22,13 @@ public static class LabelPointResolver
             return false;
 
         var centroid = ComputeCentroid(polygon);
-        if (PointInPolygon.IsInside(centroid, boundary))
+        if (PointInPolygon.IsInside(centroid, polygon))
         {
             labelPoint = centroid;
             return true;
         }
 
-        return TryPoleOfInaccessibility(polygon, boundary, out labelPoint);
+        return TryPoleOfInaccessibility(polygon, out labelPoint);
     }
 
     private static List<Point2D> Flatten(Boundary boundary)
@@ -57,7 +59,7 @@ public static class LabelPointResolver
         return new Point2D(sumX / polygon.Count, sumY / polygon.Count);
     }
 
-    private static bool TryPoleOfInaccessibility(List<Point2D> polygon, Boundary boundary, out Point2D best)
+    private static bool TryPoleOfInaccessibility(List<Point2D> polygon, out Point2D best)
     {
         best = default;
 
@@ -73,7 +75,7 @@ public static class LabelPointResolver
             maxY = Math.Max(maxY, p.Y);
         }
 
-        var bestDistance = -1.0;
+        var bestDistance = 0.0;
         for (var ix = 0; ix <= GridResolution; ix++)
         {
             var x = minX + (maxX - minX) * ix / GridResolution;
@@ -81,7 +83,7 @@ public static class LabelPointResolver
             {
                 var y = minY + (maxY - minY) * iy / GridResolution;
                 var candidate = new Point2D(x, y);
-                if (!PointInPolygon.IsInside(candidate, boundary))
+                if (!PointInPolygon.IsInside(candidate, polygon))
                     continue;
 
                 var distance = DistanceToNearestEdge(candidate, polygon);
@@ -93,7 +95,7 @@ public static class LabelPointResolver
             }
         }
 
-        return bestDistance >= 0.0;
+        return bestDistance > MinLabelOffsetCm;
     }
 
     private static double DistanceToNearestEdge(Point2D point, List<Point2D> polygon)

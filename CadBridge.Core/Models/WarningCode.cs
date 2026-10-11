@@ -13,5 +13,7 @@ public enum WarningCode
     OrphanTag,
 
     CalculationFailed,
+
+    NoLabelPoint,
 }
 

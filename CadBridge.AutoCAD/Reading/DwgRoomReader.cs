@@ -31,6 +31,7 @@ public sealed class DwgRoomReader
         {
             new TypedValue((int)DxfCode.Start, "LWPOLYLINE"),
             new TypedValue((int)DxfCode.LayerName, BoundaryLayer),
+            new TypedValue((int)DxfCode.LayoutName, "Model"),
         });
 
         var boundaries = new List<BoundaryCandidate>();
@@ -102,6 +103,7 @@ public sealed class DwgRoomReader
             new TypedValue((int)DxfCode.Start, "INSERT"),
             new TypedValue((int)DxfCode.BlockName, TagBlockName),
             new TypedValue((int)DxfCode.LayerName, BoundaryLayer),
+            new TypedValue((int)DxfCode.LayoutName, "Model"),
         });
 
         var tags = new List<TagCandidate>();
@@ -155,19 +157,22 @@ public sealed class DwgRoomReader
         List<Warning> warnings)
     {
         var rooms = new List<RoomDraft>(boundaries.Count);
-        var assigned = new HashSet<string>(StringComparer.Ordinal);
+        var claimed = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var boundary in boundaries)
         {
             var inside = new List<TagCandidate>();
             foreach (var tag in tags)
             {
+                if (claimed.Contains(tag.Handle))
+                    continue;
+
                 if (PointInPolygon.IsInside(tag.Position, boundary.Boundary))
                     inside.Add(tag);
             }
 
             foreach (var tag in inside)
-                assigned.Add(tag.Handle);
+                claimed.Add(tag.Handle);
 
             if (inside.Count == 0)
             {
@@ -191,7 +196,7 @@ public sealed class DwgRoomReader
 
         foreach (var tag in tags)
         {
-            if (!assigned.Contains(tag.Handle))
+            if (!claimed.Contains(tag.Handle))
             {
                 warnings.Add(new Warning(
                     WarningCode.OrphanTag, tag.Handle,

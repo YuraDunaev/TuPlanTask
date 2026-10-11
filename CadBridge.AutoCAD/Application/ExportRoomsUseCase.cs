@@ -26,17 +26,30 @@ public class ExportRoomsUseCase
         var readResult = Execute(document);
 
         var rooms = new List<Room>(readResult.Rooms.Count);
+        var warnings = new List<Warning>(readResult.Warnings);
         foreach (var draft in readResult.Rooms)
         {
             var boundary = draft.Boundary.Boundary;
 
             var area = AreaCalculator.Calculate(boundary);
             var perimeter = AreaCalculator.Perimeter(boundary);
-            var labelPoint = draft.Tag is { } tag
-                ? tag.Position
-                : LabelPointResolver.TryResolve(boundary, out var resolved)
-                    ? resolved
-                    : new Point2D(0, 0);
+
+            Point2D labelPoint;
+            if (draft.Tag is { } tag)
+            {
+                labelPoint = tag.Position;
+            }
+            else if (LabelPointResolver.TryResolve(boundary, out var resolved))
+            {
+                labelPoint = resolved;
+            }
+            else
+            {
+                warnings.Add(new Warning(
+                    WarningCode.NoLabelPoint, draft.Boundary.Handle,
+                    $"Room {draft.Boundary.Handle} has no tag and no interior label point; skipped."));
+                continue;
+            }
 
             var id = RoomId.From(draft.Boundary.Handle);
             rooms.Add(new Room(id, draft.Tag?.Number, draft.Tag?.Name, area, perimeter, labelPoint, boundary));
@@ -48,7 +61,7 @@ public class ExportRoomsUseCase
             ExportedAt: DateTimeOffset.UtcNow,
             Units: "cm");
 
-        var roomsDocument = new RoomsDocument(source, rooms, readResult.Warnings);
+        var roomsDocument = new RoomsDocument(source, rooms, warnings);
         var json = RoomsJsonSerializer.Serialize(roomsDocument);
 
         jsonPath = ShowSaveDialog(document.Editor);

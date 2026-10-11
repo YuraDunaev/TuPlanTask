@@ -174,8 +174,19 @@ public sealed class ImportRoomsViewModel : INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(FilePath))
             return;
 
-        var json = System.IO.File.ReadAllText(FilePath);
-        var document = RoomsJsonSerializer.Deserialize(json);
+        RoomsDocument? document;
+        try
+        {
+            var json = System.IO.File.ReadAllText(FilePath);
+            document = RoomsJsonSerializer.Deserialize(json);
+        }
+        catch (System.Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or System.Text.Json.JsonException)
+        {
+            Rooms.Clear();
+            TaskDialog.Show("CadBridge", $"Failed to load rooms.json: {ex.Message}");
+            return;
+        }
+
         if (document is null)
         {
             Rooms.Clear();
