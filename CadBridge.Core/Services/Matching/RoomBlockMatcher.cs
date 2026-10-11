@@ -27,7 +27,6 @@ public sealed record MatchingReport(
     IReadOnlyList<RoomMatch> Rooms,
     IReadOnlyList<TagBlock> OrphanTags);
 
-
 public static class RoomBlockMatcher
 {
     public static MatchingReport Match(

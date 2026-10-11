@@ -19,13 +19,12 @@ public sealed class BulgeArcTests
     [Fact]
     public void Semicircle_BulgeOne_SweepIsPi()
     {
-        // bulge = 1 → θ = 4·atan(1) = π (полуокружность)
         var arc = BulgeArc.Create(new Point2D(0, 0), new Point2D(200, 0), bulge: 1.0);
 
         Assert.True(arc.IsArc);
         Assert.Equal(Math.PI, arc.Sweep, precision: 9);
-        Assert.Equal(100.0, arc.Radius, precision: 9);      // r = chord/2
-        Assert.Equal(100.0 * Math.PI, arc.ArcLength, precision: 6); // r·θ
+        Assert.Equal(100.0, arc.Radius, precision: 9);
+        Assert.Equal(100.0 * Math.PI, arc.ArcLength, precision: 6);
     }
 
     [Fact]
@@ -69,17 +68,16 @@ public sealed class BulgeArcTests
     [Fact]
     public void BulgeGreaterThanOne_SweepExceedsPi_AndLengthExceedsSemicircle()
     {
-        // bulge = 1 → полуокружность; bulge = 2 → дуга больше полуокружности (θ > π), но меньше полного круга.
         var arc = BulgeArc.Create(new Point2D(0, 0), new Point2D(100, 0), bulge: 2.0);
 
         Assert.True(arc.IsArc);
-        Assert.True(arc.Sweep > Math.PI, $"Sweep {arc.Sweep} должен превышать π ({Math.PI})");
-        Assert.True(arc.Sweep < 2 * Math.PI, $"Sweep {arc.Sweep} не может быть больше полного круга");
+        Assert.True(arc.Sweep > Math.PI, $"Sweep {arc.Sweep} must exceed pi ({Math.PI})");
+        Assert.True(arc.Sweep < 2 * Math.PI, $"Sweep {arc.Sweep} cannot exceed a full circle");
         Assert.True(arc.Radius > 0);
 
         var semicircle = BulgeArc.Create(new Point2D(0, 0), new Point2D(100, 0), bulge: 1.0);
         Assert.True(arc.ArcLength > semicircle.ArcLength,
-            $"Дуга ({arc.ArcLength:F2}) длиннее полуокружности ({semicircle.ArcLength:F2})");
+            $"Arc ({arc.ArcLength:F2}) is longer than the semicircle ({semicircle.ArcLength:F2})");
     }
 
     [Fact]
@@ -91,10 +89,8 @@ public sealed class BulgeArcTests
         Assert.True(negative.Sweep < 0);
         Assert.Equal(positive.Sweep, -negative.Sweep, precision: 12);
 
-        // Длина не зависит от направления обхода.
         Assert.Equal(positive.ArcLength, negative.ArcLength, precision: 12);
 
-        // Знаковая площадь сегмента повторяет знак θ.
         Assert.True(negative.SegmentSignedArea < 0);
         Assert.Equal(positive.SegmentSignedArea, -negative.SegmentSignedArea, precision: 12);
     }

@@ -25,7 +25,7 @@ public static class BrokenRoomProjector
             {
                 Id = id,
                 Number = string.Empty,
-                Name = "(битый контур CAD)",
+                Name = "(broken CAD contour)",
                 RevitArea = 0,
                 CadArea = null,
                 CadContourValid = false,

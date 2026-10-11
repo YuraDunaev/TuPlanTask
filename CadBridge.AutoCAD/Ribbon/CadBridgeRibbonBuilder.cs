@@ -35,7 +35,7 @@ internal static class CadBridgeRibbonBuilder
             panelSource.Items.Add(CreateButton(
                 "exportRooms",
                 "Export Rooms",
-                "Читает RZ_AREA из DWG и пишет rooms.json",
+                "Reads RZ_AREA from the DWG and writes rooms.json",
                 "EXPORTROOMS",
                 "import-rooms-32.png",
                 "import-rooms-16.png"));
@@ -45,7 +45,7 @@ internal static class CadBridgeRibbonBuilder
             panelSource.Items.Add(CreateButton(
                 "updateRooms",
                 "Update Rooms",
-                "Размечает расхождения >1% по rooms_report.json",
+                "Marks >1% discrepancies from rooms_report.json",
                 "UPDATEROOMS",
                 "export-report-32.png",
                 "export-report-16.png"));
@@ -55,7 +55,7 @@ internal static class CadBridgeRibbonBuilder
             panelSource.Items.Add(CreateButton(
                 "clearMarks",
                 "Clear Marks",
-                "Удаляет все метки CadBridge со слоёв A-ROOM-CHECK и A-ROOM-ISSUE",
+                "Removes all CadBridge markers from layers A-ROOM-CHECK and A-ROOM-ISSUE",
                 "CLEARMARKS",
                 "clear-marks-32.png",
                 "clear-marks-16.png"));
@@ -65,7 +65,7 @@ internal static class CadBridgeRibbonBuilder
             panelSource.Items.Add(CreateButton(
                 "issueLegend",
                 "Issue Legend",
-                "Таблица пояснений к маркерам !1…!n на чертеже",
+                "Table explaining the !1…!n markers on the drawing",
                 "CADBRIDGELEGEND",
                 "issue-legend-32.png",
                 "issue-legend-16.png"));

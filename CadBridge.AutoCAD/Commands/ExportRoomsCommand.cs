@@ -20,11 +20,11 @@ public class ExportRoomsCommand
             var useCase = new ExportRoomsUseCase();
             var result = useCase.Export(document, out var jsonPath);
 
-            editor.WriteMessage("\n[CadBridge] Всё готово. Диалог выбора файла: rooms.json.");
+            editor.WriteMessage("\n[CadBridge] All set. File saved: rooms.json.");
 
             editor.WriteMessage(
                 string.Format(
-                    "\n[CadBridge] Exported {0} rooms. Warnings: {1}.",
+                    "\n[CadBridge] Exported {0} rooms. Warnings: {1} (see rooms.json → \"warnings\").",
                     result.Document.Rooms.Count,
                     result.ReadResult.Warnings.Count));
 

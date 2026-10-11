@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "rooms": [
+    {
+      "id": "440",
+      "number": "105",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 105",
+      "revitArea": 5.4384595413416426,
+      "cadArea": 5.4384595413417385,
+      "cadContourValid": true
+    },
+    {
+      "id": "3CD",
+      "number": "101",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 101",
+      "revitArea": 11.221903272666975,
+      "cadArea": 11.22190327266698,
+      "cadContourValid": true
+    },
+    {
+      "id": "3CC",
+      "number": "101",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 101",
+      "revitArea": 0,
+      "cadArea": 15.602239144314092,
+      "cadContourValid": true
+    },
+    {
+      "id": "3A1",
+      "number": "110",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 110",
+      "revitArea": 4.074999999253496,
+      "cadArea": 4.074999999253475,
+      "cadContourValid": true
+    },
+    {
+      "id": "3A0",
+      "number": "110",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 110",
+      "revitArea": 4.794999998930467,
+      "cadArea": 4.794999998930446,
+      "cadContourValid": true
+    },
+    {
+      "id": "39F",
+      "number": "110",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 110",
+      "revitArea": 4.554999999180437,
+      "cadArea": 4.55499999918043,
+      "cadContourValid": true
+    },
+    {
+      "id": "39E",
+      "number": "111",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 111",
+      "revitArea": 3.7149999996874294,
+      "cadArea": 3.7149999996874365,
+      "cadContourValid": true
+    },
+    {
+      "id": "39D",
+      "number": "112",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 112",
+      "revitArea": 4.915000000238943,
+      "cadArea": 4.915000000238931,
+      "cadContourValid": true
+    },
+    {
+      "id": "39A",
+      "number": "105",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 105",
+      "revitArea": 0.4000000000465657,
+      "cadArea": 0.4000000000465661,
+      "cadContourValid": true
+    },
+    {
+      "id": "399",
+      "number": "105",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 105",
+      "revitArea": 13.250000000703354,
+      "cadArea": 13.250000000703324,
+      "cadContourValid": true
+    },
+    {
+      "id": "398",
+      "number": "301",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 301",
+      "revitArea": 4.069999998211942,
+      "cadArea": 4.069999998211977,
+      "cadContourValid": true
+    },
+    {
+      "id": "397",
+      "number": "99",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 99",
+      "revitArea": 3.4337500011565836,
+      "cadArea": 3.433750001156563,
+      "cadContourValid": true
+    },
+    {
+      "id": "396",
+      "number": "100",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 100",
+      "revitArea": 13.499999999551806,
+      "cadArea": 13.4999999995518,
+      "cadContourValid": true
+    },
+    {
+      "id": "394",
+      "number": "99",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 99",
+      "revitArea": 0,
+      "cadArea": 361.8299999771673,
+      "cadContourValid": true
+    }
+  ]
+}

@@ -54,7 +54,6 @@ public sealed class Point2DTests
     [Fact]
     public void ToString_UsesInvariantCultureForFractions()
     {
-        // На ru-RU без инварианта вышло бы "(1,5, 2,5)" и сломало бы JSON.
         Assert.Equal("(1.5, 2.25)", new Point2D(1.5, 2.25).ToString());
     }
 }

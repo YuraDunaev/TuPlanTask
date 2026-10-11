@@ -14,7 +14,6 @@ public sealed class LabelPointResolverTests
         new BoundaryVertex(0, height, 0),
     });
 
-    /// <summary>U-образная комната: ценroid вершин попадает в «зазор» и вне контура.</summary>
     private static Boundary UShape() => new(new[]
     {
         new BoundaryVertex(0, 0, 0),
@@ -27,7 +26,6 @@ public sealed class LabelPointResolverTests
         new BoundaryVertex(0, 400, 0),
     });
 
-    /// <summary>L-образная комната (центroid вершин внутри).</summary>
     private static Boundary LShape() => new(new[]
     {
         new BoundaryVertex(0, 0, 0),
@@ -56,7 +54,7 @@ public sealed class LabelPointResolverTests
 
         Assert.True(resolved);
         Assert.True(PointInPolygon.IsInside(point, boundary),
-            $"Точка подписи {point} оказалась вне помещения.");
+            $"Label point {point} fell outside the room.");
     }
 
     [Fact]
@@ -70,7 +68,6 @@ public sealed class LabelPointResolverTests
     [Fact]
     public void CentroidOfUShape_IsIndeedOutside_ProvingNeedForScan()
     {
-        // Документирующий тест: обычный центроид провалился бы в зазор U.
         var boundary = UShape();
         var centroid = new Point2D(200, 225);
         Assert.False(PointInPolygon.IsInside(centroid, boundary));

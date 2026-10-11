@@ -20,7 +20,7 @@ public class ClearMarkersCommand
             var removed = new ClearMarkersUseCase().Execute(document);
 
             editor.WriteMessage(string.Format(
-                "\n[CadBridge] CLEARMARKS: удалено меток: {0}.", removed));
+                "\n[CadBridge] CLEARMARKS: markers removed: {0}.", removed));
         }
         catch (System.Exception ex)
         {

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <!-- wpf нужен для диалога импорта (MVVM) -->
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -12,22 +11,28 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Ресурсы: png для иконок кнопок (svg — как исходники для перерисовки) -->
     <EmbeddedResource Include="Assets\*.png" />
     <EmbeddedResource Include="Assets\*.svg" />
   </ItemGroup>
 
   <ItemGroup>
-    <!--
-      api ревит 2025.
-      ExcludeAssets="runtime" = Copy Local false: revitapi/revitapiui отдаёт
-      запущенный ревит, рядом с плагином их класть нельзя.
-    -->
     <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CadBridge.Core\CadBridge.Core.csproj" />
   </ItemGroup>
+
+  <Target Name="DeployAddin" AfterTargets="Build">
+    <PropertyGroup>
+      <RevitAddinsDir>$(APPDATA)\Autodesk\Revit\Addins\2025</RevitAddinsDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(RevitAddinsDir)" />
+    <WriteLinesToFile
+      File="$(RevitAddinsDir)\CadBridge.addin"
+      Lines="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;%0A&lt;RevitAddIns&gt;%0A  &lt;AddIn Type=&quot;Application&quot;&gt;%0A    &lt;Name&gt;CadBridge&lt;/Name&gt;%0A    &lt;Assembly&gt;$(TargetPath)&lt;/Assembly&gt;%0A    &lt;AddInId&gt;3F8E2A71-9C4D-4B6A-BE15-6D2F0A7C9E84&lt;/AddInId&gt;%0A    &lt;FullClassName&gt;CadBridge.Revit.App&lt;/FullClassName&gt;%0A    &lt;VendorId&gt;CBRG&lt;/VendorId&gt;%0A    &lt;VendorDescription&gt;CadBridge test task&lt;/VendorDescription&gt;%0A  &lt;/AddIn&gt;%0A&lt;/RevitAddIns&gt;"
+      Overwrite="true"
+      ContinueOnError="WarnAndContinue" />
+  </Target>
 
 </Project>

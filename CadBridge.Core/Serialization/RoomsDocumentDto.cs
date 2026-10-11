@@ -9,7 +9,6 @@ public sealed class PointDto
     public double Y { get; set; }
 }
 
-/// <summary>Вершина границы в «плоском» виде <c>{ "x", "y", "bulge" }</c> (см).</summary>
 public sealed class BoundaryVertexDto
 {
     public double X { get; set; }

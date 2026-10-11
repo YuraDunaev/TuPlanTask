@@ -7,7 +7,6 @@ public sealed class BoundaryTests
     [Fact]
     public void Constructor_DropsDuplicatedClosingVertex()
     {
-        // AutoCAD нередко отдаёт последнюю вершину, равную первой
         var boundary = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 0),
@@ -46,7 +45,6 @@ public sealed class BoundaryTests
     [Fact]
     public void ToString_UsesInvariantCultureForBulge()
     {
-        // На ru-RU без инварианта bulge=0.5 превратился бы в "0,5" в логах.
         Assert.Equal("(10, 20) bulge=0.5", new BoundaryVertex(10, 20, 0.5).ToString());
         Assert.Equal("(10, 20)", new BoundaryVertex(10, 20, 0).ToString());
     }

@@ -43,16 +43,13 @@ public sealed class RoomsJsonSerializerTests
         Assert.Contains("\"area\": 18.45", json);
         Assert.Contains("\"perimeter\": 17.38", json);
 
-        // boundary — плоский массив { x, y, bulge }, без вложенного "point"/"vertices"
         Assert.Contains("\"boundary\"", json);
         Assert.Contains("\"bulge\"", json);
         Assert.DoesNotContain("\"vertices\"", json);
 
-        // camelCase: PascalCase-имен быть не должно
         Assert.DoesNotContain("\"SchemaVersion\"", json);
         Assert.DoesNotContain("\"ExportedAt\"", json);
 
-        // WriteIndented
         Assert.Contains("\n", json);
     }
 
@@ -153,7 +150,6 @@ public sealed class RoomsJsonSerializerTests
     [Fact]
     public void Deserialize_EmptyWarningMessage_BecomesPlaceholder()
     {
-        // Путь из ToModel: пустое сообщение входящего JSON заменяется на placeholder.
         const string json = """
         {
           "schemaVersion": "1.0",

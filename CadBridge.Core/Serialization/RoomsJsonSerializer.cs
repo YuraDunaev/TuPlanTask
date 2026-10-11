@@ -39,8 +39,6 @@ public static class RoomsJsonSerializer
         return dto is null ? null : ToModel(dto);
     }
 
-    // ---- домен → DTO ----
-
     public static RoomsDocumentDto ToDto(RoomsDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
@@ -86,8 +84,6 @@ public static class RoomsJsonSerializer
 
         return dto;
     }
-
-    // ---- DTO → домен ----
 
     public static RoomsDocument ToModel(RoomsDocumentDto dto)
     {

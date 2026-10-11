@@ -54,7 +54,6 @@ public readonly struct BulgeArc
         Chord = chord;
     }
 
-
     public static BulgeArc Create(Point2D from, Point2D to, double bulge)
     {
         var chord = from.DistanceTo(to);
@@ -71,7 +70,6 @@ public readonly struct BulgeArc
 
         return new BulgeArc(from, to, sweep, radius, center, startAngle);
     }
-
 
     public IEnumerable<Point2D> Flatten(int segments = DefaultSegments)
     {

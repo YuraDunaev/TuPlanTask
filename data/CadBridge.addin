@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>CadBridge</Name>
+    <Assembly>..\CadBridge.Revit\bin\Debug\net8.0-windows\CadBridge.Revit.dll</Assembly>
+    <AddInId>3F8E2A71-9C4D-4B6A-BE15-6D2F0A7C9E84</AddInId>
+    <FullClassName>CadBridge.Revit.App</FullClassName>
+    <VendorId>CBRG</VendorId>
+    <VendorDescription>CadBridge test task</VendorDescription>
+  </AddIn>
+</RevitAddIns>

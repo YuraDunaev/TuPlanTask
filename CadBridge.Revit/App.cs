@@ -3,7 +3,6 @@ using CadBridge.Revit.Ribbon;
 
 namespace CadBridge.Revit;
 
-// TODO: IExternalApplication — OnStartup строит вкладку ленты с двумя кнопками, OnShutdown чистит
 public class App : IExternalApplication
 {
     public Result OnStartup(UIControlledApplication application)

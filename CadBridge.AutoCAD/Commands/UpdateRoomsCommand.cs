@@ -22,14 +22,14 @@ public class UpdateRoomsCommand
             var reportPath = ShowOpenDialog(document);
             if (string.IsNullOrWhiteSpace(reportPath))
             {
-                editor.WriteMessage("\n[CadBridge] UPDATEROOMS отменён: файл не выбран.");
+                editor.WriteMessage("\n[CadBridge] UPDATEROOMS cancelled: no file selected.");
                 return;
             }
 
             var result = new UpdateRoomsUseCase().Execute(document, reportPath);
 
             editor.WriteMessage(string.Format(
-                "\n[CadBridge] UPDATEROOMS: размечено {0}, расхождений >1%: {1}, не найдено в чертеже: {2}.",
+                "\n[CadBridge] UPDATEROOMS: marked {0}, discrepancies >1%: {1}, not found in drawing: {2}.",
                 result.Marked, result.Mismatched, result.Missing));
         }
         catch (System.Exception ex)
@@ -45,7 +45,7 @@ public class UpdateRoomsCommand
         var dialog = new OpenFileDialog
         {
             Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-            Title = "Выберите rooms_report.json",
+            Title = "Select rooms_report.json",
             FileName = "rooms_report.json",
             DefaultExt = "json",
             CheckFileExists = true,

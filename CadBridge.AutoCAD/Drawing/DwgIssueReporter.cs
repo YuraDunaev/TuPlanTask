@@ -47,7 +47,6 @@ public sealed class DwgIssueReporter
             drawable.Add((warning, $"{warning.EntityId}:{warning.Code}", at));
         }
 
-        // Нумерация !1…!n: сверху вниз, слева направо; тай-брейк по ключу — детерминизм.
         var ordered = drawable
             .OrderByDescending(x => x.At.Y)
             .ThenBy(x => x.At.X)

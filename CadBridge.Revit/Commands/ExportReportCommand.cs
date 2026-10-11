@@ -23,7 +23,7 @@ public class ExportReportCommand : IExternalCommand
 
             if (report.Rooms.Count == 0)
             {
-                TaskDialog.Show("CadBridge — Export Report", "Импортированные помещения не найдены. Сначала выполните Import Rooms.");
+                TaskDialog.Show("CadBridge — Export Report", "No imported rooms found. Run Import Rooms first.");
                 return Result.Cancelled;
             }
 
@@ -34,12 +34,12 @@ public class ExportReportCommand : IExternalCommand
             File.WriteAllText(path, RoomsReportJsonSerializer.Serialize(report));
 
             TaskDialog.Show("CadBridge — Export Report",
-                $"Записан отчёт rooms_report.json ({report.Rooms.Count} пом.).\n{path}");
+                $"Report rooms_report.json written ({report.Rooms.Count} rooms).\n{path}");
             return Result.Succeeded;
         }
         catch (IOException ex)
         {
-            message = $"Не удалось записать файл: {ex.Message}";
+            message = $"Failed to write file: {ex.Message}";
             return Result.Failed;
         }
         catch (Exception ex)
@@ -52,13 +52,13 @@ public class ExportReportCommand : IExternalCommand
     private static string? AskRoomsJsonPath()
     {
         var answer = TaskDialog.Show("CadBridge — Export Report",
-            "Добавить в отчёт помещения с битым контуром из rooms.json?",
+            "Add rooms with broken contours from rooms.json to the report?",
             TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No);
         if (answer != TaskDialogResult.Yes)
             return null;
 
         using var dialog = new FileOpenDialog("rooms.json|*.json");
-        dialog.Title = "Выберите rooms.json (можно отменить)";
+        dialog.Title = "Select rooms.json (can be cancelled)";
         if (dialog.Show() != ItemSelectionDialogResult.Confirmed)
             return null;
 
@@ -68,7 +68,7 @@ public class ExportReportCommand : IExternalCommand
     private static string? AskSavePath()
     {
         using var dialog = new FileSaveDialog("rooms_report.json|*.json");
-        dialog.Title = "Сохранить rooms_report.json";
+        dialog.Title = "Save rooms_report.json";
         dialog.InitialFileName = "rooms_report.json";
         if (dialog.Show() != ItemSelectionDialogResult.Confirmed)
             return null;

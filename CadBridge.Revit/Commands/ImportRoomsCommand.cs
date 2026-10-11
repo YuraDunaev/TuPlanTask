@@ -29,13 +29,13 @@ public class ImportRoomsCommand : IExternalCommand
             var level = viewModel.GetSelectedLevel();
             if (level is null)
             {
-                message = "Выберите уровень для импорта.";
+                message = "Select a level for the import.";
                 return Result.Failed;
             }
 
             if (string.IsNullOrWhiteSpace(viewModel.FilePath) || !File.Exists(viewModel.FilePath))
             {
-                message = "Укажите существующий файл rooms.json (кнопка Browse…).";
+                message = "Provide an existing rooms.json file (Browse… button).";
                 return Result.Failed;
             }
 
@@ -43,7 +43,7 @@ public class ImportRoomsCommand : IExternalCommand
             var sourceDocument = RoomsJsonSerializer.Deserialize(json);
             if (sourceDocument is null)
             {
-                message = "Не удалось разобрать rooms.json.";
+                message = "Failed to parse rooms.json.";
                 return Result.Failed;
             }
 
@@ -64,35 +64,35 @@ public class ImportRoomsCommand : IExternalCommand
     {
         var lines = new List<string>
         {
-            $"Создано: {result.Created}",
-            $"Обновлено: {result.Updated}",
-            $"Ошибок: {result.Errors.Count}",
+            $"Created: {result.Created}",
+            $"Updated: {result.Updated}",
+            $"Errors: {result.Errors.Count}",
         };
 
         if (result.Errors.Count > 0)
         {
             lines.Add(string.Empty);
-            lines.Add("Ошибки:");
+            lines.Add("Errors:");
             foreach (var error in result.Errors.Take(10))
                 lines.Add($"  • {error.Room?.Number} — {error.Reason}");
             if (result.Errors.Count > 10)
-                lines.Add($"  … и ещё {result.Errors.Count - 10}");
+                lines.Add($"  … and {result.Errors.Count - 10} more");
         }
 
         if (result.Missing.Count > 0)
         {
             lines.Add(string.Empty);
-            lines.Add($"Отсутствуют в файле (не удалены): {result.Missing.Count}");
+            lines.Add($"Missing from the file (not deleted): {result.Missing.Count}");
             foreach (var missing in result.Missing.Take(10))
                 lines.Add($"  • {missing.Number} — {missing.Name}");
             if (result.Missing.Count > 10)
-                lines.Add($"  … и ещё {result.Missing.Count - 10}");
+                lines.Add($"  … and {result.Missing.Count - 10} more");
         }
 
         if (result.Warnings.Count > 0)
         {
             lines.Add(string.Empty);
-            lines.Add($"Предупреждений из rooms.json: {result.Warnings.Count} (см. warnings в файле).");
+            lines.Add($"Warnings from rooms.json: {result.Warnings.Count} (see warnings in the file).");
         }
 
         TaskDialog.Show("CadBridge — Import Rooms", string.Join(Environment.NewLine, lines));

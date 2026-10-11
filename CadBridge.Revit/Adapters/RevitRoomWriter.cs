@@ -31,7 +31,7 @@ public sealed class RevitRoomWriter
         catch (System.Exception ex)
         {
             transaction.RollBack();
-            throw new InvalidOperationException($"Не удалось создать помещение {domainRoom}: {ex.Message}", ex);
+            throw new InvalidOperationException($"Failed to create room {domainRoom}: {ex.Message}", ex);
         }
     }
 
@@ -61,7 +61,7 @@ public sealed class RevitRoomWriter
         catch (System.Exception ex)
         {
             transaction.RollBack();
-            throw new InvalidOperationException($"Не удалось обновить помещение {domainRoom}: {ex.Message}", ex);
+            throw new InvalidOperationException($"Failed to update room {domainRoom}: {ex.Message}", ex);
         }
     }
 
@@ -74,7 +74,7 @@ public sealed class RevitRoomWriter
         var room = _document.Create.NewRoom(_level, location);
         if (room is null)
             throw new InvalidOperationException(
-                $"Room не создан: точка label вне границы (или граница не замкнута). id={domainRoom.Id}");
+                $"Room not created: label point is outside the boundary (or the boundary is not closed). id={domainRoom.Id}");
 
         if (!string.IsNullOrWhiteSpace(domainRoom.Number))
             room.Number = domainRoom.Number;

@@ -18,8 +18,8 @@ public sealed class AreaCalculatorTests
     {
         var rect = Rectangle(500, 369);
 
-        Assert.Equal(18.45, AreaCalculator.Calculate(rect), precision: 6);   // м²
-        Assert.Equal(17.38, AreaCalculator.Perimeter(rect), precision: 6);    // м
+        Assert.Equal(18.45, AreaCalculator.Calculate(rect), precision: 6);
+        Assert.Equal(17.38, AreaCalculator.Perimeter(rect), precision: 6);
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public sealed class AreaCalculatorTests
         var convex = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 0),
-            new BoundaryVertex(500, 0, 0.5), // дуга выпукло наружу
+            new BoundaryVertex(500, 0, 0.5),
             new BoundaryVertex(500, 369, 0),
             new BoundaryVertex(0, 369, 0),
         });
@@ -44,7 +44,7 @@ public sealed class AreaCalculatorTests
         var concave = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 0),
-            new BoundaryVertex(500, 0, -0.5), // дуга вогнуто внутрь
+            new BoundaryVertex(500, 0, -0.5),
             new BoundaryVertex(500, 369, 0),
             new BoundaryVertex(0, 369, 0),
         });
@@ -77,7 +77,6 @@ public sealed class AreaCalculatorTests
             new BoundaryVertex(0, 369, 0),
         });
 
-        // дуговое ребро длиннее хорды, поэтому периметр больше, чем у прямоугольника
         Assert.True(AreaCalculator.Perimeter(withArc) > AreaCalculator.Perimeter(Rectangle(500, 369)));
         Assert.Equal(17.967, AreaCalculator.Perimeter(withArc), precision: 3);
     }
@@ -92,13 +91,12 @@ public sealed class AreaCalculatorTests
             new BoundaryVertex(0, 300, 0),
         });
 
-        Assert.Equal(4.5, AreaCalculator.Calculate(triangle), precision: 6); // (300·300/2)/10000 = 4.5 м²
+        Assert.Equal(4.5, AreaCalculator.Calculate(triangle), precision: 6);
     }
 
     [Fact]
     public void WideArcBulgeGreaterThanOne_AddsMoreSignedAreaThanSemicircle()
     {
-        // §3.2.1: дуговая формула должна корректно работать и при θ > π (bulge > 1).
         var semicircle = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 0),

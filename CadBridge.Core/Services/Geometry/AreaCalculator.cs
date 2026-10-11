@@ -9,7 +9,7 @@ public static class AreaCalculator
     {
         ArgumentNullException.ThrowIfNull(boundary);
         if (boundary.Count < 3)
-            throw new ArgumentException("Контур должен содержать минимум 3 вершины.", nameof(boundary));
+            throw new ArgumentException("Boundary must contain at least 3 vertices.", nameof(boundary));
 
         var vertices = boundary.Vertices;
         var n = vertices.Count;
@@ -32,7 +32,7 @@ public static class AreaCalculator
     {
         ArgumentNullException.ThrowIfNull(boundary);
         if (boundary.Count < 3)
-            throw new ArgumentException("Контур должен содержать минимум 3 вершины.", nameof(boundary));
+            throw new ArgumentException("Boundary must contain at least 3 vertices.", nameof(boundary));
 
         var vertices = boundary.Vertices;
         var n = vertices.Count;

@@ -30,11 +30,11 @@ public sealed class UpdateRoomsUseCase
     {
         ArgumentNullException.ThrowIfNull(document);
         if (string.IsNullOrWhiteSpace(reportPath) || !File.Exists(reportPath))
-            throw new FileNotFoundException("rooms_report.json не найден.", reportPath);
+            throw new FileNotFoundException("rooms_report.json was not found.", reportPath);
 
         var report = RoomsReportJsonSerializer.Deserialize(File.ReadAllText(reportPath));
         if (report is null)
-            throw new InvalidDataException("Не удалось разобрать rooms_report.json.");
+            throw new InvalidDataException("Failed to parse rooms_report.json.");
 
         var readResult = new DwgRoomReader().Read(document);
         var labelByHandle = BuildLabelIndex(readResult);

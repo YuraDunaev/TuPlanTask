@@ -13,7 +13,6 @@ public sealed class UnitConverterTests
     [Fact]
     public void Room500x369cm_Is18_45m2()
     {
-        // 500 см × 369 см = 184500 см² = 18.45 м²
         Assert.Equal(18.45, UnitConverter.CmSquaredToSquareMeters(500 * 369), precision: 12);
     }
 
@@ -39,10 +38,10 @@ public sealed class UnitConverterTests
     }
 
     [Theory]
-    [InlineData(18.45, 18.45, false)]      // равны — не превышает
-    [InlineData(18.45, 18.46, false)]      // 0.05 % — в пределах 1 %
-    [InlineData(18.45, 18.70, true)]       // ~1.35 % — превышает 1 %
-    [InlineData(18.45, 18.24, true)]       // ~1.14 % — превышает 1 %
+    [InlineData(18.45, 18.45, false)]
+    [InlineData(18.45, 18.46, false)]
+    [InlineData(18.45, 18.70, true)]
+    [InlineData(18.45, 18.24, true)]
     public void ExceedsTolerance_OnePercent(double autocad, double revit, bool expected)
     {
         Assert.Equal(expected, UnitConverter.ExceedsTolerance(autocad, revit));

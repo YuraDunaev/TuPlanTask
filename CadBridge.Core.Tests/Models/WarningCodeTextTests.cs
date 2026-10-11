@@ -7,7 +7,6 @@ public sealed class WarningCodeTextTests
     [Fact]
     public void ShortLabel_MatchesDrawingContract()
     {
-        // Метки видны на чертеже — контракт с DwgIssueReporter фиксируем тестом.
         Assert.Equal("OPEN", WarningCodeText.ShortLabel(WarningCode.OpenPolyline));
         Assert.Equal("NO TAG", WarningCodeText.ShortLabel(WarningCode.NoTag));
         Assert.Equal("TAGS x2", WarningCodeText.ShortLabel(WarningCode.MultipleTags));
@@ -29,7 +28,7 @@ public sealed class WarningCodeTextTests
         foreach (var code in Enum.GetValues<WarningCode>())
         {
             var description = WarningCodeText.Description(code);
-            Assert.False(string.IsNullOrWhiteSpace(description), $"Нет пояснения для {code}.");
+            Assert.False(string.IsNullOrWhiteSpace(description), $"No description for {code}.");
         }
     }
 
@@ -45,8 +44,7 @@ public sealed class WarningCodeTextTests
     [Fact]
     public void Description_CoversKnownCases()
     {
-        // Пояснения из легенды: битый контур / нет тега — по ним пользователь сверяет чертёж.
-        Assert.Contains("Битый контур", WarningCodeText.Description(WarningCode.OpenPolyline));
-        Assert.Contains("Нет тега", WarningCodeText.Description(WarningCode.NoTag));
+        Assert.Contains("Broken contour", WarningCodeText.Description(WarningCode.OpenPolyline));
+        Assert.Contains("No tag", WarningCodeText.Description(WarningCode.NoTag));
     }
 }

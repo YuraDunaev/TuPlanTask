@@ -44,7 +44,7 @@ public class ExportRoomsUseCase
 
         var source = new SourceInfo(
             Application: "CadBridge.AutoCAD",
-            File: document.Name,
+            File: Path.GetFileName(document.Name),
             ExportedAt: DateTimeOffset.UtcNow,
             Units: "cm");
 
@@ -66,7 +66,7 @@ public class ExportRoomsUseCase
         var dialog = new SaveFileDialog
         {
             Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-            Title = "Сохранить rooms.json",
+            Title = "Save rooms.json",
             FileName = "rooms.json",
             DefaultExt = "json",
             AddExtension = true,

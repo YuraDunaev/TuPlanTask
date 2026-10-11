@@ -55,7 +55,7 @@ public sealed class RoomBlockMatcherTests
         var match = Assert.Single(report.Rooms);
         Assert.Equal(MatchKind.MultipleTags, match.Kind);
         Assert.Equal(2, match.TagCount);
-        Assert.NotNull(match.Tag); // берётся первый по порядку
+        Assert.NotNull(match.Tag);
     }
 
     [Fact]
@@ -89,7 +89,6 @@ public sealed class RoomBlockMatcherTests
     [Fact]
     public void TagOnSharedEdge_CountedOnce_FirstRoomWins()
     {
-        // Тег на общей границе двух комнат не должен засчитаться обеим.
         var report = RoomBlockMatcher.Match(
             new[]
             {

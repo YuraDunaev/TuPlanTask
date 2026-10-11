@@ -55,7 +55,6 @@ public sealed class SourceIdStoreTests
     [Fact]
     public void SchemaContract_IsStable_ForExistingRevitModels()
     {
-        // ломка этих значений = потеря связи с уже записанными помещениями
         Assert.Equal(Guid.Parse("5F7C4B3E-2D1A-4F8E-9A6C-7B5D3E1F2A4C"), SourceIdStore.SchemaId);
         Assert.Equal("SourceId", SourceIdStore.FieldName);
         Assert.Equal("CadArea", SourceIdStore.FieldNameCadArea);

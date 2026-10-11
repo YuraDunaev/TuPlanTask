@@ -21,7 +21,7 @@ public sealed class ImportRoomsUseCase
         ArgumentNullException.ThrowIfNull(sourceDocument);
 
         var level = _document.GetElement(levelId) as Level
-                    ?? throw new ArgumentException($"Уровень с id {levelId} не найден.", nameof(levelId));
+                    ?? throw new ArgumentException($"Level with id {levelId} not found.", nameof(levelId));
 
         var result = new ImportResult();
         foreach (var warning in sourceDocument.Warnings)
@@ -64,7 +64,7 @@ public sealed class ImportRoomsUseCase
         catch (Exception ex)
         {
             group.RollBack();
-            throw new InvalidOperationException($"Импорт отменён: {ex.Message}", ex);
+            throw new InvalidOperationException($"Import cancelled: {ex.Message}", ex);
         }
 
         return result;

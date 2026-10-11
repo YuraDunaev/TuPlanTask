@@ -15,11 +15,11 @@ public static class WarningCodeText
 
     public static string Description(WarningCode code) => code switch
     {
-        WarningCode.OpenPolyline => "Битый контур: полилиния границы помещения не замкнута.",
-        WarningCode.NoTag => "Нет тега: внутри контура не найдена подпись с номером помещения.",
-        WarningCode.MultipleTags => "Несколько тегов: внутри контура несколько подписей, взята первая.",
-        WarningCode.OrphanTag => "Лишний тег: подпись лежит вне границ любого помещения.",
-        WarningCode.CalculationFailed => "Не считается: геометрия контура некорректна (мало вершин или вырождена).",
-        _ => "Неизвестный код расхождения.",
+        WarningCode.OpenPolyline => "Broken contour: the room boundary polyline is not closed.",
+        WarningCode.NoTag => "No tag: no label with a room number was found inside the contour.",
+        WarningCode.MultipleTags => "Multiple tags: several labels inside the contour, the first one is used.",
+        WarningCode.OrphanTag => "Orphan tag: the label lies outside any room boundary.",
+        WarningCode.CalculationFailed => "Not calculated: the contour geometry is invalid (too few vertices or degenerate).",
+        _ => "Unknown discrepancy code.",
     };
 }

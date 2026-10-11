@@ -94,7 +94,7 @@ public sealed class RoomsDocumentTests
     private static Room MakeRoom(string handle, string number) => new(
         RoomId.From(handle),
         number,
-        "Жилое помещение",
+        "Living room",
         18.45,
         17.38,
         new Point2D(250, 184.5),

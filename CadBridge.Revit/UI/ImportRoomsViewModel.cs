@@ -148,7 +148,7 @@ public sealed class ImportRoomsViewModel : INotifyPropertyChanged
         if (Levels.Count == 0)
             TaskDialog.Show(
                 "CadBridge",
-                "В модели не найдено ни одного уровня (FilteredElementCollector → 0 элементов).");
+                "No levels found in the model (FilteredElementCollector returned 0 elements).");
     }
 
     public Level? GetSelectedLevel() =>

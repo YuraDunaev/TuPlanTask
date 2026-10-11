@@ -3,14 +3,8 @@ using CadBridge.Core.Models;
 
 namespace CadBridge.Core.Tests.Geometry;
 
-/// <summary>
-/// Вычитка границ помещения: тег-блок RZ_AREA_SYM лежит внутри полилинии или вне любого контура.
-/// Дуги (bulge) разворачиваются в хорды, поэтому проверяются и выпуклые, и невыпуклые,
-/// и дуговые контуры — ровно те случаи, что есть в rooms_sample.dwg.
-/// </summary>
 public sealed class PointInPolygonTests
 {
-    /// <summary>Прямоугольник, у которого ребро B->C заменено дугой (bulge задаётся на вершине B).</summary>
     private static Boundary RectWithBulgedRightEdge(double bulge) => new(new[]
     {
         new BoundaryVertex(0, 0, 0),
@@ -77,8 +71,6 @@ public sealed class PointInPolygonTests
         Assert.False(PointInPolygon.IsInside(new Point2D(250, 250), triangle));
     }
 
-    // --- невыпуклые контуры: ray casting должен учитывать каждый проход луча ---
-
     [Fact]
     public void IsInside_HandlesLShape_NotchOutside()
     {
@@ -97,7 +89,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_HandlesUShape_CountsTwoRayCrossings()
     {
-        // U-образный контур: луч из точки внутри полости пересекает границу дважды
         var uShape = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 0), new BoundaryVertex(300, 0, 0), new BoundaryVertex(300, 300, 0),
@@ -113,7 +104,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_HandlesZigzagStar_ConcaveSpikes()
     {
-        // Звёздочка: все лучи через центр несут разное число пересечений
         var spikes = new List<BoundaryVertex>();
         const int points = 8;
         for (var i = 0; i < points; i++)
@@ -126,22 +116,17 @@ public sealed class PointInPolygonTests
 
         var star = new Boundary(spikes);
 
-        // Центр и лучи-спайки — внутри
         Assert.True(PointInPolygon.IsInside(new Point2D(100, 100), star));
         Assert.True(PointInPolygon.IsInside(new Point2D(180, 100), star));
         Assert.True(PointInPolygon.IsInside(new Point2D(70, 70), star));
 
-        // Впадины между спиками (r > 40 от центра в промежуточных направлениях) — снаружи
         Assert.False(PointInPolygon.IsInside(new Point2D(61.1, 41.8), star));
         Assert.False(PointInPolygon.IsInside(new Point2D(77.3, 44.6), star));
     }
 
-    // --- дуговые сегменты (bulge): помещение с закруглением по ТЗ ---
-
     [Fact]
     public void IsInside_ArcBulgeOutward_PointInsideCurvedArea()
     {
-        // bulge = 0.5 на ребре B->C даёт дугу, выпирающую НАРУЖУ от контура
         var arc = RectWithBulgedRightEdge(0.5);
 
         Assert.True(PointInPolygon.IsInside(new Point2D(250, 184.5), arc));
@@ -160,8 +145,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_ArcDoesNotMirrorToWrongSide()
     {
-        // Тот же прямоугольник без дуги: точка за правой стенкой обязана быть снаружи,
-        // иначе аппроксимация дуги «размазала» контур в другую сторону.
         var straight = RectWithBulgedRightEdge(0.0);
 
         Assert.False(PointInPolygon.IsInside(new Point2D(590, 184.5), straight));
@@ -170,7 +153,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_NegativeBulge_CurvesOtherWay()
     {
-        // bulge < 0 — дуга выгибается в противоположную сторону (внутрь контура)
         var inward = RectWithBulgedRightEdge(-0.5);
 
         Assert.True(PointInPolygon.IsInside(new Point2D(250, 184.5), inward));
@@ -180,8 +162,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_SemicircleBulge_MatchesAnalyticSemicircle()
     {
-        // bulge = 1 — ровно полуокружность; хорда (0,0)->(200,0), центр (100,0), радиус 100,
-        // дуга выгибается вниз, т.е. контур = прямоугольник + полукруглый выступ.
         var half = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 1),
@@ -197,8 +177,6 @@ public sealed class PointInPolygonTests
         Assert.False(PointInPolygon.IsInside(new Point2D(-50, 100), half));
     }
 
-    // --- edge cases: читатель не должен падать на битых данных из DWG ---
-
     [Fact]
     public void IsInside_ThrowsForNullBoundary()
     {
@@ -209,7 +187,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_DoesNotThrowForCollinearBoundary()
     {
-        // Вырожденный контур: Boundary допускает 3 вершины на одной прямой
         var degenerate = new Boundary(new[]
         {
             new BoundaryVertex(0, 0, 0),
@@ -224,7 +201,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_HandlesNegativeCoordinates()
     {
-        // Чертежи часто в отрицательной четверти (UCS/INSUNITS), знак не должен ломать ray casting
         var shifted = new Boundary(new[]
         {
             new BoundaryVertex(-500, -369, 0),
@@ -240,7 +216,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_HandlesVerySmallRoom()
     {
-        // Комнаты в сантиметрах: 10x10 см — границы не должны «схлопываться» из-за допуска
         var tiny = Rectangle(10, 10);
 
         Assert.True(PointInPolygon.IsInside(new Point2D(5, 5), tiny));
@@ -259,7 +234,6 @@ public sealed class PointInPolygonTests
     [Fact]
     public void IsInside_PointExactlyOnArcChordEnd()
     {
-        // Точка совпадает с конечной вершиной дугового ребра
         var arc = RectWithBulgedRightEdge(0.5);
 
         Assert.True(PointInPolygon.IsInside(new Point2D(500, 0), arc));

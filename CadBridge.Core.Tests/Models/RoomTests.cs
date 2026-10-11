@@ -18,7 +18,7 @@ public sealed class RoomTests
         var room = new Room(
             RoomId.From("2A5"),
             "105",
-            "Жилое помещение",
+            "Living room",
             18.45,
             17.38,
             new Point2D(250, 184.5),
@@ -26,7 +26,7 @@ public sealed class RoomTests
 
         Assert.Equal("2A5", room.Id.Value);
         Assert.Equal("105", room.Number);
-        Assert.Equal("Жилое помещение", room.Name);
+        Assert.Equal("Living room", room.Name);
         Assert.Equal(18.45, room.Area);
         Assert.Equal(17.38, room.Perimeter);
         Assert.Equal(new Point2D(250, 184.5), room.LabelPoint);
@@ -91,7 +91,7 @@ public sealed class RoomTests
     public void ToString_IncludesNumberWhenPresent()
     {
         var room = new Room(
-            RoomId.From("2A5"), "105", "Жилое помещение", 18.45, 17.38, new Point2D(0, 0), Boundary());
+            RoomId.From("2A5"), "105", "Living room", 18.45, 17.38, new Point2D(0, 0), Boundary());
 
         Assert.Equal("Room 105 (2A5)", room.ToString());
     }

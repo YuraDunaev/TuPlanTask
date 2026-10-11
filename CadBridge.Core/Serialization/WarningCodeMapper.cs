@@ -2,7 +2,6 @@ using CadBridge.Core.Models;
 
 namespace CadBridge.Core.Serialization;
 
-
 public static class WarningCodeMapper
 {
     public static string ToWire(WarningCode code) => code switch
