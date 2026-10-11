@@ -3,7 +3,7 @@
   "source": {
     "application": "CadBridge.AutoCAD",
     "file": "rooms_sample.dwg",
-    "exportedAt": "2026-10-11T10:01:09.1895480Z",
+    "exportedAt": "2026-10-11T18:54:06.8613574Z",
     "units": "cm"
   },
   "rooms": [
@@ -75,13 +75,13 @@
     },
     {
       "id": "3CC",
-      "number": "101",
+      "number": "102",
       "name": "",
       "area": 15.602239144314092,
       "perimeter": 15.801119572229563,
       "labelPoint": {
-        "x": 2612.8265149142826,
-        "y": 967.3240047619911
+        "x": 2605.250514929241,
+        "y": 1188.177295772126
       },
       "boundary": [
         {
@@ -508,13 +508,13 @@
     },
     {
       "id": "394",
-      "number": "99",
+      "number": "1",
       "name": "",
       "area": 361.8299999771673,
       "perimeter": 106.79999999700522,
       "labelPoint": {
-        "x": 1617.109506580804,
-        "y": 1466.9268205444569
+        "x": 2389.775859975489,
+        "y": 1323.1852150890045
       },
       "boundary": [
         {
@@ -683,11 +683,6 @@
     },
     {
       "code": "MULTIPLE_TAGS",
-      "entityId": "3CC",
-      "message": "Room 3CC has 2 tag blocks; using 3D4."
-    },
-    {
-      "code": "MULTIPLE_TAGS",
       "entityId": "397",
       "message": "Room 397 has 2 tag blocks; using 42D."
     },
@@ -699,7 +694,7 @@
     {
       "code": "MULTIPLE_TAGS",
       "entityId": "394",
-      "message": "Room 394 has 11 tag blocks; using 42D."
+      "message": "Room 394 has 3 tag blocks; using 3C6."
     },
     {
       "code": "ORPHAN_TAG",
