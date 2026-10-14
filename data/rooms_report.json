@@ -19,9 +19,9 @@
     },
     {
       "id": "3CC",
-      "number": "101",
-      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 101",
-      "revitArea": 0,
+      "number": "102",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 102",
+      "revitArea": 4.380335871647135,
       "cadArea": 15.602239144314092,
       "cadContourValid": true
     },
@@ -107,9 +107,9 @@
     },
     {
       "id": "394",
-      "number": "99",
-      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 99",
-      "revitArea": 0,
+      "number": "1",
+      "name": "\u041F\u043E\u043C\u0435\u0449\u0435\u043D\u0438\u0435 1",
+      "revitArea": 305.28328462089877,
       "cadArea": 361.8299999771673,
       "cadContourValid": true
     }

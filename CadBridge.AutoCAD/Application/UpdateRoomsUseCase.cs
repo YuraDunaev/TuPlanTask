@@ -114,7 +114,7 @@ public sealed class UpdateRoomsUseCase
     private void DrawText(Transaction tr, BlockTableRecord space, RoomReport room, Point2D label)
     {
         var center = new Point3d(label.X, label.Y - TextOffsetCm, 0);
-        var content = $"Revit: {room.RevitArea:F2} m²";
+        var content = $"Revit: {room.RevitArea:F2} m²{FormatDelta(room)}";
 
         var existing = FindOwned(tr, space, room.Id, RoomMarkerStore.KindText);
         if (existing is DBText text)
@@ -141,6 +141,20 @@ public sealed class UpdateRoomsUseCase
         space.AppendEntity(dbText);
         tr.AddNewlyCreatedDBObject(dbText, true);
         _markers.Mark(dbText, room.Id, RoomMarkerStore.KindText);
+    }
+
+    private static string FormatDelta(RoomReport room)
+    {
+        var cad = room.CadArea;
+        var ratio = AreaDelta.Ratio(room.RevitArea, cad);
+        if (cad is null || ratio is null)
+            return " (Δ n/a)";
+
+        var delta = $"Δ {ratio.Value * 100:F2}%";
+        if (AreaDelta.Exceeds(room.RevitArea, cad, ToleranceRatio))
+            delta = $"CAD: {cad.Value:F2} m², {delta}";
+
+        return $" ({delta})";
     }
 
     private void DrawMarker(Transaction tr, BlockTableRecord space, RoomReport room, Point2D label)

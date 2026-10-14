@@ -171,7 +171,7 @@ The `DeployAddin` target writes the manifest to `%APPDATA%\Autodesk\Revit\Addins
 
 ### 6.1 Revit: *Export Report*
 
-Writes `rooms_report.json` for every imported room: **source id, number, name, Revit-computed area, and the CAD area recorded at first import**. Broken contours (open polylines) that never became Revit rooms are appended with `revitArea = 0`, `cadArea = null`, `cadContourValid = false` (via `BrokenRoomProjector`), so the AutoCAD side can still flag them.
+Writes `rooms_report.json` for every imported room: **source id, number, name, Revit-computed area, and the CAD area recorded at first import**. Each source id yields exactly **one row** (`ExportReportUseCase.GroupBySourceId`): if the model still contains a stale *unplaced* duplicate (`Area = 0`) next to the real placed room carrying the same source id — e.g. after a re-import that could not re-place a room — the placed room wins, so the report always carries the **actual Revit area**, never a leftover zero. Broken contours (open polylines) that never became Revit rooms are appended with `revitArea = 0`, `cadArea = null`, `cadContourValid = false` (via `BrokenRoomProjector`), so the AutoCAD side can still flag them.
 
 ![rooms.json and rooms_report.json output](screenshots/08-rooms-jsons.png)
 
@@ -180,6 +180,7 @@ Writes `rooms_report.json` for every imported room: **source id, number, name, R
 Reads `rooms_report.json` and, for each room matched by handle:
 
 - if the **Revit area differs from the CAD area by more than 1 %** → draws a **yellow diamond** marker at the room's label point on layer **`A-ROOM-CHECK`**;
+- **every matched room** gets a grey text label under its block with the Revit area and the **discrepancy percentage** against the CAD area: `Revit: 5.44 m² (Δ 0.00%)`. When the difference exceeds 1 %, the label additionally shows the CAD area it is compared against: `Revit: 4.07 m² (CAD: 4.60 m², Δ 11.52%)`. When the report carries no CAD area (`cadArea = null`), the label shows `Δ n/a` instead of a percentage.
 ![CAD Bridge shows the discrepancy markers on the plan](screenshots/05-update-rooms-markers.png)
 ![UPDATEROOMS — grey area labels under room blocks](screenshots/06-update-rooms-markers.png)
 
@@ -187,7 +188,7 @@ Additionally, every CAD-side warning (open contour, missing/duplicate tag, orpha
 
 ![Issue Legend dialog with numbered markers](screenshots/07-issue-legend.png)
 
-> **Documented deviations from the literal §5.2 text** (allowed by "or another marker"): the discrepancy marker is a **diamond** (not a red circle); the area text is **grey** for contrast; warning triangles live on a separate `A-ROOM-ISSUE` layer. The required layer for discrepancy marking (`A-ROOM-CHECK`) and idempotency are preserved.
+> **Documented deviations from the literal §5.2 text** (allowed by "or another marker"): the discrepancy marker is a **diamond** (not a red circle); the area text is **grey** for contrast (and additionally carries the Δ% discrepancy — plus the CAD area when the tolerance is exceeded); warning triangles live on a separate `A-ROOM-ISSUE` layer. The required layer for discrepancy marking (`A-ROOM-CHECK`) and idempotency are preserved.
 
 
 ---
@@ -281,7 +282,7 @@ dotnet test CadBridge.Core.Tests\CadBridge.Core.Tests.csproj
 
 **Total: 161 tests, all green.** The tests deliberately cover not only the happy path but also the task's edge cases (no tag, duplicate tag, orphan, arc geometry).
 
-> Host-bound code (`RevitRoomWriter`, `LayerAudit`, `DwgRoomReader`, `UpdateRoomsUseCase`) is **not** unit-tested here — it needs a live Revit/AutoCAD `Document`. Those paths were verified manually against the sample drawing; to automate them one would extract the pure decisions into `CadBridge.Core` (candidate: room-number assignment, layer/name policy) or drive them from a Revit test framework.
+> Host-bound code (`RevitRoomWriter`, `LayerAudit`, `DwgRoomReader`, `UpdateRoomsUseCase`, `ExportReportUseCase`) is **not** unit-tested here — it needs a live Revit/AutoCAD `Document`. Those paths were verified manually against the sample drawing; to automate them one would extract the pure decisions into `CadBridge.Core` (candidate: room-number assignment, layer/name policy) or drive them from a Revit test framework.
 
 ---
 
@@ -302,7 +303,7 @@ No runtime third-party logic libraries are used. `CadBridge.Core` has **zero** p
 ## 10. Limitations, Assumptions & Known Behaviour
 
 - **Tag payload split (documented assumption).** In the supplied sample, each valid `RZ_AREA_SYM` block carries only the usage *number* (e.g. `105`) in its attribute; the free-text *name* is empty. CadBridge therefore writes `number = <tag value>`, `name = ""`. The parser also understands the `tag: X value: Y` text form and attribute-name fallbacks (`USAGE_TYPE`), so a drawing that supplies a name populates `name` automatically. The JSON schema is unchanged — only this semantic split is documented.
-- **Rooms that Revit cannot bound.** If separation lines self-intersect or a boundary is malformed, Revit may create an *unplaced* room whose `Area` is `0`. CadBridge reports this honestly (`revitArea = 0`), and `UPDATEROOMS` flags it as a >1 % discrepancy. Fixing it is a Revit-side modelling action, not a plugin bug.
+- **Rooms that Revit cannot bound.** If separation lines self-intersect or a boundary is malformed, Revit may create an *unplaced* room whose `Area` is `0`. `Export Report` deduplicates by source id (the placed room wins over the stale unplaced duplicate), but if only the unplaced one carries the id it is still reported honestly (`revitArea = 0`), and `UPDATEROOMS` flags it as a >1 % discrepancy. Fixing it is a Revit-side modelling action, not a plugin bug.
 - **Discrepancy tolerance is 1 %** as required; because it is relative to the CAD area, very small rooms can show large-looking percentages for sub-centimetre differences.
 - **Handle-based id (§7.1):** redrawing a boundary from scratch yields a new id → a new Revit room on the next import; the previous one is listed as missing (never auto-deleted).
 - **Marker shapes** are a diamond / warning triangle rather than the literal "red circle" of §5.2 — permitted by "or another marker"; the required `A-ROOM-CHECK` layer and idempotency are preserved.

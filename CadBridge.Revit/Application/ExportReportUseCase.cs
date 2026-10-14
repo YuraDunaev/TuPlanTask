@@ -29,12 +29,8 @@ public sealed class ExportReportUseCase
             .Cast<Autodesk.Revit.DB.Architecture.Room>()
             .ToList();
 
-        foreach (var room in rooms)
+        foreach (var (sourceId, room) in GroupBySourceId(rooms, store))
         {
-            var sourceId = store.GetSourceId(room);
-            if (sourceId is null)
-                continue;
-
             ids.Add(sourceId);
             var revitAreaM2 = AreaToM2(room.Area);
 
@@ -53,6 +49,39 @@ public sealed class ExportReportUseCase
             AppendBrokenRooms(report, roomsJsonPath, ids);
 
         return report;
+    }
+
+    /// <summary>
+    /// One report row per source id. A re-import can leave an old unplaced duplicate
+    /// (Area == 0) next to the real placed room carrying the same SourceId; the placed
+    /// one holds the actual Revit area, so it wins over the stale leftover.
+    /// </summary>
+    private static IReadOnlyList<(string SourceId, Autodesk.Revit.DB.Architecture.Room Room)> GroupBySourceId(
+        List<Autodesk.Revit.DB.Architecture.Room> rooms,
+        SourceIdStore store)
+    {
+        var ordered = new List<(string SourceId, Autodesk.Revit.DB.Architecture.Room Room)>();
+        var indexBySourceId = new Dictionary<string, int>(System.StringComparer.Ordinal);
+
+        foreach (var room in rooms)
+        {
+            var sourceId = store.GetSourceId(room);
+            if (sourceId is null)
+                continue;
+
+            if (!indexBySourceId.TryGetValue(sourceId, out var index))
+            {
+                indexBySourceId[sourceId] = ordered.Count;
+                ordered.Add((sourceId, room));
+                continue;
+            }
+
+            var current = ordered[index].Room;
+            if (current.Area <= 0 && room.Area > 0)
+                ordered[index] = (sourceId, room);
+        }
+
+        return ordered;
     }
 
     private static void AppendBrokenRooms(RoomsReportDocument report, string roomsJsonPath, List<string> ids)
